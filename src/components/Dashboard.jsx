@@ -1,5 +1,6 @@
 import React from 'react';
 import HealthMetrics from './HealthMetrics';
+import WeightForm from './WeightForm';
 
 
 function Dashboard() {
@@ -8,6 +9,8 @@ function Dashboard() {
       <h2>Dashboard</h2>
       <p>Your personalized health insights will appear here.</p>
       <HealthMetrics/>
+      <WeightForm/>
+
     </div>
   );
 }
