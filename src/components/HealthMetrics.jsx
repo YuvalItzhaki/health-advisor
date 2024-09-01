@@ -9,15 +9,21 @@ function HealthMetrics({ onSelectWeight }) {
   useEffect(() => {
     const fetchWeights = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/health/weights/${userId}`);
+        const response = await axios.get(`http://localhost:5001/api/health/weight/${userId}`);
         setWeights(response.data);
       } catch (error) {
         console.error('Error fetching weights:', error);
       }
     };
 
-    fetchWeights();
+    if (userId) {
+      fetchWeights();
+    }
   }, [userId]);
+
+  if (!weights.length) {
+    return <div>No weights found. Please add your first weight entry.</div>;
+  }
 
   return (
     <div>

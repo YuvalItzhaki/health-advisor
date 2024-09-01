@@ -7,16 +7,11 @@ function Dashboard() {
   const [selectedWeight, setSelectedWeight] = useState(null);
 
   const handleSave = (newWeight) => {
-    setWeights([...weights, newWeight]); 
+    setWeights([...weights, newWeight]);
   };
 
   const handleWeightSelect = (weight) => {
-    console.log('Selected weight:', weight);
     setSelectedWeight(weight);
-  };
-
-  const handleDelete = (weightId) => {
-    // Logic to delete weight
   };
 
   return (
@@ -28,7 +23,9 @@ function Dashboard() {
         weightId={selectedWeight ? selectedWeight._id : null} 
         existingWeight={selectedWeight ? selectedWeight.weight : ''} 
         onSave={handleSave} 
-        onDelete={handleDelete} 
+        onDelete={(weightId) => {
+          // Logic to delete weight
+        }} 
       />
     </div>
   );

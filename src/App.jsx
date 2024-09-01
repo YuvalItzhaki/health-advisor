@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import Register from './components/Register'
 import Navbar from './components/Navbar';
+import InitialSetup from './components/InitialSetup';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/initial-setup" element={<InitialSetup />} />
         </Routes>
       </div>
     </Router>

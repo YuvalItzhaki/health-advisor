@@ -25,7 +25,7 @@ function Register() {
       }));
 
       // Redirect to dashboard
-      navigate('/dashboard');
+      navigate('/initial-setup');
     } catch (err) {
       console.error(err);
     }
