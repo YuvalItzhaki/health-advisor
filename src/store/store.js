@@ -1,14 +1,20 @@
-// src/store/store.js
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './reducers/userReducer';
+import rootReducer from './reducers/userReducer';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
+import { PersistGate } from 'redux-persist/integration/react';
 
-// Create the Redux store using configureStore
+const persistConfig = {
+  key: 'root',
+  storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 const store = configureStore({
-  reducer: {
-    user: userReducer,
-    // other reducers can be added here
-  },
-  // middleware and devTools options can also be configured here
+  reducer: persistedReducer,
 });
 
-export default store;
+const persistor = persistStore(store);
+
+export { store, persistor };

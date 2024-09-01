@@ -1,7 +1,10 @@
 // src/store/reducers/userReducer.js
 const initialState = {
-    userId: null,
-    // other user state fields
+    user: {
+      userId: null,
+      // other user-related fields
+    },
+    // other state fields
   };
   
   const userReducer = (state = initialState, action) => {
