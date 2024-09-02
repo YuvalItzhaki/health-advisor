@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 
-function WeightForm({ weightId = null, existingWeight = '', onSave, handleDelete }) {
-  console.log('Received weightId in WeightForm:', weightId);
-  
+function WeightForm({ weightId = null, existingWeight = '', onSave, onDelete }) {
   const userId = useSelector((state) => state.userId.userId);
-  console.log('Received userId from Redux:', userId);
+
   if (!userId) {
     // Render nothing or a loading indicator if userId is not available
     return <div>Loading...</div>;
@@ -16,7 +14,6 @@ function WeightForm({ weightId = null, existingWeight = '', onSave, handleDelete
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting weight. UserId:', userId, 'WeightId:', weightId);
 
     try {
       if (weightId) {
@@ -31,6 +28,15 @@ function WeightForm({ weightId = null, existingWeight = '', onSave, handleDelete
       setWeight('');
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:5001/api/health/weight/${weightId}`);
+      onDelete(weightId); // Call the onDelete function passed as a prop
+    } catch (error) {
+      console.error('Error deleting weight:', error);
     }
   };
 
