@@ -2,37 +2,36 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 
-function HealthMetrics({ onSelectWeight }) {
-  const [weights, setWeights] = useState([]);
+function HealthMetrics() {
+  const [healthData, setHealthData] = useState(null);
   const userId = useSelector((state) => state.userId.userId); // Get the userId from Redux
 
   useEffect(() => {
-    const fetchWeights = async () => {
+    const fetchHealthData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/health/weight/${userId}`);
-        setWeights(response.data);
+        const response = await axios.get(`http://localhost:5001/api/health/data?userId=${userId}`);
+        setHealthData(response.data);
       } catch (error) {
-        console.error('Error fetching weights:', error);
+        console.error('Error fetching health data:', error);
       }
     };
 
     if (userId) {
-      fetchWeights();
+      fetchHealthData();
     }
   }, [userId]);
 
-  if (!weights.length) {
-    return <div>No weights found. Please add your first weight entry.</div>;
+  if (!healthData) {
+    return <div>Loading health data...</div>; // Loading state while fetching data
   }
 
   return (
     <div>
-      <h3>Your Weights</h3>
-      {weights.map((weight) => (
-        <div key={weight._id} onClick={() => onSelectWeight(weight)}>
-          Weight: {weight.weight}
-        </div>
-      ))}
+      <h3>Your Health Data</h3>
+      <p>Weight: {healthData.weight}</p>
+      <p>Height: {healthData.height}</p>
+      <p>Age: {healthData.age}</p>
+      <p>Gender: {healthData.gender}</p>
     </div>
   );
 }
