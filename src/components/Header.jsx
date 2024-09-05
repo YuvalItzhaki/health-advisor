@@ -1,6 +1,8 @@
 import React from 'react';
 import '../style/Header.css';
 import { useSelector } from 'react-redux';
+import logo from '../assets/logo/logo.webp';
+
 
 
 function Header({ userName, profilePicture }) {
@@ -9,7 +11,7 @@ function Header({ userName, profilePicture }) {
   return (
     <header className="dashboard-header">
       <div className="left-section">
-        <img src="/path-to-logo.png" alt="App Logo" className="logo" />
+        <img src={logo} alt="App Logo" className="logo" />
         <h1 className="title">User Dashboard</h1>
       </div>
 

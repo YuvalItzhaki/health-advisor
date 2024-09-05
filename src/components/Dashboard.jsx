@@ -1,44 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import { useSelector } from 'react-redux';
 import WeightForm from './WeightForm';
 import HeightForm from './HeightForm';
 import Header from './Header';
+import HealthMetrics from './HealthMetrics';
+import '../style/Dashboard.css';
+
 
 function Dashboard() {
-  const [weights, setWeights] = useState([]);
-  const [selectedWeight, setSelectedWeight] = useState(null);
+  const [weights, setWeights] = useState([]); // State for weights
+  const [heights, setHeights] = useState([]); // State for heights
+  const [selectedWeight, setSelectedWeight] = useState(null); // State for selected weight
+  const [selectedHeight, setSelectedHeight] = useState(null); // State for selected height
+  const userId = useSelector((state) => state.userId.userId);
+  console.log('userId', userId)
 
 
 
-  const handleSave = (newData) => {
-    // Logic to update the state with newData (could include weight, height, etc.)
-    setWeights([...weights, newData.weight]);
-    // Update other states for height, age, etc.
+  const handleWeightSave = (newWeight) => {
+    axios.put(`http://localhost:5001/api/health/weight/${userId}`, { weight: newWeight })
+      .then(response => {
+        console.log('Weight updated:', response.data);
+        // Update the weight in the local state
+        setWeights(weights.map(w => w.userId === userId ? response.data : w));
+      })
+      .catch(error => {
+        console.error('Error updating weight:', error);
+      });
   };
 
+  const handleHeightSave = (newHeight) => {
+    axios.put(`http://localhost:5001/api/health/height/${userId}`, { height: newHeight })
+      .then(response => {
+        console.log('Height updated:', response.data);
+        // Update the weight in the local state
+        setHeights(heights.map(h => h.userId === userId ? response.data : h));
+      })
+      .catch(error => {
+        console.error('Error updating height:', error);
+      });
+  };
+  
   return (
     <div className="dashboard">
-      <h2>Dashboard</h2>
+      <Header />
       <div className="metrics-grid">
         <div className="metric-card">
-          <h3>Weight</h3>
+          <HealthMetrics weights={weights} heights={heights} />
+        </div>
+        <div className="metric-card">
+          <h3>Edit Your Health Data</h3>
+          <h4>Weight</h4>
           <WeightForm 
             weightId={selectedWeight ? selectedWeight._id : null} 
             existingWeight={selectedWeight ? selectedWeight.weight : ''} 
-            onSave={handleSave}
+            onChange={handleWeightSave}
           />
-        </div>
-        <div className="metric-card">
-          <h3>Height</h3>
+          <h4>Height</h4>
           <HeightForm 
-            // Similar logic as WeightForm for handling height
-            onSave={handleSave}
+            heightId={selectedHeight ? selectedHeight._id : null} 
+            existingHeight={selectedHeight ? selectedHeight.height : ''}
+            onChange={handleHeightSave} 
           />
         </div>
-        {/* Add more metric cards as needed */}
       </div>
-      <button>Save All</button>
+      <button onClick={() => handleSave({ weight: selectedWeight?.weight, height: selectedHeight?.height })}>Save All</button>
     </div>
   );
 }
