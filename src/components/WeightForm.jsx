@@ -1,30 +1,23 @@
 import React, { useState } from 'react';
 
 function WeightForm({ existingWeight = '', onChange }) {
-  const [weight, setWeight] = useState(existingWeight); // Local state for the input field
+  const [weight, setWeight] = useState(existingWeight);
 
   const handleWeightChange = (e) => {
-    setWeight(e.target.value); // Update the local state as the user types
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-    onChange(weight); // Call onSave only when the user submits the form
+    setWeight(e.target.value);  // Update local state
+    onChange(e.target.value);   // Pass the updated value to parent
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Weight:
-        <input
-          type="number"
-          value={weight}
-          onChange={handleWeightChange} // Update the input value on change
-          required
-        />
-      </label>
-      <button type="submit">Save</button> {/* Submit button to trigger onSave */}
-    </form>
+    <div>
+      <label>Weight:</label>
+      <input
+        type="number"
+        value={weight}
+        onChange={handleWeightChange}  // Update as user types
+        required
+      />
+    </div>
   );
 }
 

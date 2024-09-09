@@ -7,7 +7,6 @@ import Header from './Header';
 import HealthMetrics from './HealthMetrics';
 import '../style/Dashboard.css';
 
-
 function Dashboard() {
   const [weights, setWeights] = useState([]); // State for weights
   const [heights, setHeights] = useState([]); // State for heights
@@ -16,13 +15,11 @@ function Dashboard() {
   const userId = useSelector((state) => state.userId.userId);
   console.log('userId', userId)
 
-
-
+  // Save individual weight
   const handleWeightSave = (newWeight) => {
     axios.put(`http://localhost:5001/api/health/weight/${userId}`, { weight: newWeight })
       .then(response => {
         console.log('Weight updated:', response.data);
-        // Update the weight in the local state
         setWeights(weights.map(w => w.userId === userId ? response.data : w));
       })
       .catch(error => {
@@ -30,18 +27,34 @@ function Dashboard() {
       });
   };
 
+  // Save individual height
   const handleHeightSave = (newHeight) => {
     axios.put(`http://localhost:5001/api/health/height/${userId}`, { height: newHeight })
       .then(response => {
         console.log('Height updated:', response.data);
-        // Update the weight in the local state
         setHeights(heights.map(h => h.userId === userId ? response.data : h));
       })
       .catch(error => {
         console.error('Error updating height:', error);
       });
   };
+
+  const handleSaveAll = () => {
+    axios.put(`http://localhost:5001/api/health/${userId}`, {
+      weight: selectedWeight?.weight,
+      height: selectedHeight?.height
+    })
+      .then(response => {
+        console.log('Health data updated:', response);
+        setWeights(response.data.weights || []); // Fallback to empty array if weights are missing
+        setHeights(response.data.heights || []); // Fallback to empty array if heights are missing
+      })
+      .catch(error => {
+        console.error('Error saving health data:', error);
+      });
+  };
   
+
   return (
     <div className="dashboard">
       <Header />
@@ -65,7 +78,8 @@ function Dashboard() {
           />
         </div>
       </div>
-      <button onClick={() => handleSave({ weight: selectedWeight?.weight, height: selectedHeight?.height })}>Save All</button>
+      {/* Save all data */}
+      <button onClick={handleSaveAll}>Save All</button>
     </div>
   );
 }

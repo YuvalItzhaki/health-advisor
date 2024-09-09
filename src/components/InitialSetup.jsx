@@ -35,11 +35,9 @@ function InitialSetup() {
     <div>
       <h2>Initial Setup</h2>
       <p>Please enter your initial weight.</p>
-      {/* Pass the onChange prop */}
       <WeightForm existingWeight={weight} onChange={(value) => setWeight(value)} />
 
       <p>Please enter your height.</p>
-      {/* Pass the onChange prop */}
       <HeightForm existingHeight={height} onChange={(value) => setHeight(value)} />
 
       <p>Please enter your age.</p>
@@ -61,8 +59,8 @@ function InitialSetup() {
         <option value="female">Female</option>
         <option value="other">Other</option>
       </select>
-
-      <button onClick={handleSave}>Save & Continue</button>
+      
+      <div><button onClick={handleSave}>Save & Continue</button></div>
     </div>
   );
 }
