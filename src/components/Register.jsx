@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setUserId } from '../store/actions/userActions'; // Make sure to import the action
+import UserActions from '../actions/UserActions';  // Import Flux UserActions
 
 function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch(); // Initialize useDispatch
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = async (e) => {
@@ -17,14 +15,14 @@ function Register() {
       const response = await axios.post('http://localhost:5001/api/users/register', { name, email, password });
       console.log('response from server: ', response.data);
 
-      // Store user in Redux
-      dispatch(setUserId({
+      // Use Flux to update the user
+      UserActions.updateUser({
         userId: response.data._id, 
         name: response.data.name,
         email: response.data.email
-      }));
+      });
 
-      // Redirect to dashboard
+      // Redirect to the initial setup page
       navigate('/initial-setup');
     } catch (err) {
       console.error(err);

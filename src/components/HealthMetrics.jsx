@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
+import userStoreInstance from '../stores/UserStore'
+
 
 function HealthMetrics() {
   const [healthData, setHealthData] = useState(null);
-  const userId = useSelector((state) => state.userId.userId); // Get the userId from Redux
+  const userId = userStoreInstance.getUser()?.userId || localStorage.getItem('userId');
 
   useEffect(() => {
+
     const fetchHealthData = async () => {
       try {
         const response = await axios.get(`http://localhost:5001/api/health/data?userId=${userId}`);

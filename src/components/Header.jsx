@@ -1,28 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../style/Header.css';
-import { useSelector } from 'react-redux';
 import logo from '../assets/logo/logo.webp';
-import { useDispatch } from 'react-redux';
+import UserStore from '../stores/UserStore';  // Import the Flux store for user data
+import UserActions from '../actions/UserActions';  // Import user-related actions
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../store/authSlice'; // Assuming you have a logout action in your store
 
-
-
-function Header({profilePicture }) {
-  const name = useSelector((state) => state.userId.name); // Get the userId from Redux
-
-  const dispatch = useDispatch();
+function Header({ profilePicture }) {
+  const [name, setName] = useState('');  // Initialize name state
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Check for user in UserStore or localStorage
+    const loadUser = () => {
+      const user = UserStore.getUser();
+      if (user) {
+        setName(user.name);
+      } else {
+        // If no user in store, try to load from localStorage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setName(parsedUser.name);
+          UserActions.updateUser(parsedUser);  // Update UserStore with localStorage data
+        }
+      }
+    };
+
+    loadUser();  // Load user on component mount
+
+    // Add the change listener to update when UserStore changes
+    UserStore.addChangeListener(loadUser);
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      UserStore.removeChangeListener(loadUser);
+    };
+  }, []);
+
   const handleLogout = () => {
-    // Clear user data (assuming you use redux-persist or something similar)
-    dispatch(logout());
-
-    // Optionally clear localStorage if you store any token
-    localStorage.removeItem('authToken');
-
-    // Navigate to login page
-    navigate('/login');
+    UserActions.logout();  // Call the logout action
+    navigate('/login');  // Navigate to the login page
   };
 
   return (

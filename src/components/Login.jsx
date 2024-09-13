@@ -1,33 +1,36 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
-import { setUserId } from '../store/actions/userActions'; // Import the action that sets the userId in Redux
+import { useAuth } from '../context/AuthContext'; // Adjust the path as necessary
 import { useNavigate } from 'react-router-dom';
+import  UserActions  from '../actions/UserActions'
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const { login } = useAuth(); // Get login function from AuthContext
   const navigate = useNavigate(); // Initialize useNavigate
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5001/api/auth/login', { email, password });
-      console.log('Login response:', response.data);
-      const userId = response.data._id; // Adjust based on response structure
-      if (userId) {
-        dispatch(setUserId(userId)); // Store userId in Redux
-        navigate('/dashboard');
+      var userData = response.data
+      console.log('Login response:', userData);
+
+      // Assuming the server responds with a user object or token
+      if (userData) {
+        UserActions.updateUser(userData);
+        // Here, you can save any user data or token you might need
+        localStorage.setItem('authToken', userData.token); // Save token if provided
+        login(); // Update authentication state
+        navigate('/dashboard'); // Navigate to dashboard
       } else {
-        console.error('User ID not found in response');
+        console.error('User data not found in response');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
     } 
   };
-  
 
   return (
     <div>

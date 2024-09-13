@@ -4,16 +4,18 @@ import HeightForm from './HeightForm';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import userStoreInstance from '../stores/UserStore'
 
 function InitialSetup() {
-  const userId = useSelector((state) => state.userId.userId);
-  const [weight, setWeight] = useState('');
-  const [height, setHeight] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const navigate = useNavigate();
+    const user = userStoreInstance.getUser();
+    const userId = user ? user.userId : null;  // Get only the userId from the user object
+    const [weight, setWeight] = useState('');
+    const [height, setHeight] = useState('');
+    const [age, setAge] = useState('');
+    const [gender, setGender] = useState('');
+    const navigate = useNavigate();
 
-  const handleSave = async () => {
+    const handleSave = async () => {
     try {
       // Send a single POST request with all the data
       const response = await axios.post('http://localhost:5001/api/health/setup', {
