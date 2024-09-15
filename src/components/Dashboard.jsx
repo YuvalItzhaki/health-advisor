@@ -22,13 +22,16 @@ function Dashboard() {
 
   // Check localStorage and UserStore for user data on component mount
   useEffect(() => {
-    const storedUser = userStoreInstance.getUser() || JSON.parse(localStorage.getItem('user'));
-    const storedUserId = storedUser?.userId || localStorage.getItem('userId');
+    // const storedUser = userStoreInstance.getUser() || JSON.parse(localStorage.getItem('user'));
+    // const storedUserId = storedUser?.userId || localStorage.getItem('userId');
+    const storedUser = JSON.parse(localStorage.getItem('user')); // Parse the user from localStorage
+    const userId = userStoreInstance.getUser()?.userId || (storedUser ? storedUser._id : null);
 
-    if (!storedUserId) {
+
+    if (!userId) {
       navigate('/login'); // If no userId found, redirect to login
     } else {
-      setUserId(storedUserId); // Set userId from the store or localStorage
+      setUserId(userId); // Set userId from the store or localStorage
       setUser(storedUser); // Set user data from the store or localStorage
     }
   }, [navigate]); // This effect runs once, on component mount
