@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-// import { useSelector } from 'react-redux';
 import userStoreInstance from '../stores/UserStore'
 
 
 function HealthMetrics() {
   const [healthData, setHealthData] = useState(null);
-  const userId = userStoreInstance.getUser()?.userId || localStorage.getItem('userId');
+  const storedUser = JSON.parse(localStorage.getItem('user')); // Parse the user from localStorage
+  const userId = userStoreInstance.getUser()?.userId || (storedUser ? storedUser._id : null);
 
   useEffect(() => {
 

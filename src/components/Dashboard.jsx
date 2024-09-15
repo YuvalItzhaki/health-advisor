@@ -14,22 +14,25 @@ function Dashboard() {
   const [heights, setHeights] = useState([]); // State for heights
   const [selectedWeight, setSelectedWeight] = useState(null); // State for selected weight
   const [selectedHeight, setSelectedHeight] = useState(null); // State for selected height
-  const [userId, setUserId] = useState(null); // State for userId
+  const [userId, setUserId] = useState(null); // Initialize with null and set later
+  const [user, setUser] = useState({}); // Initialize with an empty object
+
 
   const navigate = useNavigate();
 
   // Check localStorage and UserStore for user data on component mount
   useEffect(() => {
     const storedUser = userStoreInstance.getUser() || JSON.parse(localStorage.getItem('user'));
-    
-    if (storedUser && storedUser.userId) {
-      setUserId(storedUser.userId); // Set userId
-      localStorage.setItem('user', JSON.stringify(storedUser)); // Ensure it's in localStorage
-      UserActions.updateUser(storedUser); // Update UserStore in case it's not up-to-date
+    const storedUserId = storedUser?.userId || localStorage.getItem('userId');
+
+    if (!storedUserId) {
+      navigate('/login'); // If no userId found, redirect to login
     } else {
-      navigate('/login'); // Redirect to login if no userId found
+      setUserId(storedUserId); // Set userId from the store or localStorage
+      setUser(storedUser); // Set user data from the store or localStorage
     }
-  }, [navigate]);
+  }, [navigate]); // This effect runs once, on component mount
+
 
   // Save individual weight
   const handleWeightSave = (newWeight) => {

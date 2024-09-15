@@ -14,14 +14,16 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5001/api/auth/login', { email, password });
-      var userData = response.data
-      console.log('Login response:', userData);
-
-      // Assuming the server responds with a user object or token
+      const userData = response.data;
+  
       if (userData) {
-        UserActions.updateUser(userData);
-        // Here, you can save any user data or token you might need
+        // Save user data to localStorage
         localStorage.setItem('authToken', userData.token); // Save token if provided
+        localStorage.setItem('user', JSON.stringify(userData)); // Save user data
+  
+        // Update user data in Flux store
+        UserActions.updateUser(userData);
+  
         login(); // Update authentication state
         navigate('/dashboard'); // Navigate to dashboard
       } else {
@@ -29,7 +31,7 @@ function Login() {
       }
     } catch (err) {
       console.error('Login error:', err);
-    } 
+    }
   };
 
   return (
