@@ -43,13 +43,16 @@ function InitialSetup() {
       <HeightForm existingHeight={height} onChange={(value) => setHeight(value)} />
 
       <p>Please enter your age.</p>
+      <div>
+      <label>Age:</label>
       <input
         type="number"
         value={age}
         onChange={(e) => setAge(e.target.value)}
         required
       />
-
+      </div>
+      
       <p>Please select your gender.</p>
       <select
         value={gender}
