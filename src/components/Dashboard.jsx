@@ -8,6 +8,7 @@ import HealthMetrics from './HealthMetrics';
 import '../style/Dashboard.css';
 import userStoreInstance from '../stores/UserStore';
 import UserActions from '../actions/UserActions'; // For updating the store
+import HealthHistory from './HealthHistory';
 
 function Dashboard() {
   const [weights, setWeights] = useState([]); // State for weights
@@ -39,32 +40,39 @@ function Dashboard() {
 
   // Save individual weight
   const handleWeightSave = (newWeight) => {
-    if (!userId) return;
-
-    axios.put(`http://localhost:5001/api/health/weight/${userId}`, { weight: newWeight })
-      .then(response => {
-        console.log('Weight updated:', response.data);
-        setWeights(weights.map(w => w.userId === userId ? response.data : w));
-      })
-      .catch(error => {
-        console.error('Error updating weight:', error);
-      });
+    axios.put(`http://localhost:5001/api/health/weights/${userId}`, { 
+      weights: [{ value: newWeight, date: new Date() }]
+    })
+    .then(response => {
+      console.log('Weight updated:', response.data);
+      
+      // Update weights and selectedWeight with the new value
+      const updatedWeight = { value: newWeight, date: new Date() };
+      setWeights([...weights, updatedWeight]); // Append new entry to weights array
+      setSelectedWeight(updatedWeight); // Update selectedWeight with the new value
+    })
+    .catch(error => {
+      console.error('Error updating weight:', error);
+    });
   };
-
-  // Save individual height
+  
   const handleHeightSave = (newHeight) => {
-    if (!userId) return;
-
-    axios.put(`http://localhost:5001/api/health/height/${userId}`, { height: newHeight })
-      .then(response => {
-        console.log('Height updated:', response.data);
-        setHeights(heights.map(h => h.userId === userId ? response.data : h));
-      })
-      .catch(error => {
-        console.error('Error updating height:', error);
-      });
+    axios.put(`http://localhost:5001/api/health/heights/${userId}`, { 
+      heights: [{ value: newHeight, date: new Date() }]
+    })
+    .then(response => {
+      console.log('Height updated:', response.data);
+      
+      // Update heights and selectedHeight with the new value
+      const updatedHeight = { value: newHeight, date: new Date() };
+      setHeights([...heights, updatedHeight]); // Append new entry to heights array
+      setSelectedHeight(updatedHeight); // Update selectedHeight with the new value
+    })
+    .catch(error => {
+      console.error('Error updating height:', error);
+    });
   };
-
+  
   // Save all data (both weight and height)
   const handleSaveAll = () => {
     if (!userId) return;
@@ -94,13 +102,13 @@ function Dashboard() {
           <h3>Edit Your Health Data</h3>
           <h4>Weight</h4>
           <WeightForm 
-            weightId={selectedWeight ? selectedWeight._id : null} 
-            existingWeight={selectedWeight ? selectedWeight.weight : ''} 
+            // weightId={selectedWeight ? selectedWeight._id : null} 
             onChange={handleWeightSave}
+            existingWeight={selectedWeight ? selectedWeight.weight : ''} 
           />
           <h4>Height</h4>
           <HeightForm 
-            heightId={selectedHeight ? selectedHeight._id : null} 
+            // heightId={selectedHeight ? selectedHeight._id : null} 
             existingHeight={selectedHeight ? selectedHeight.height : ''}
             onChange={handleHeightSave} 
           />
@@ -108,6 +116,7 @@ function Dashboard() {
       </div>
       {/* Save all data */}
       <button onClick={handleSaveAll}>Save All</button>
+      <HealthHistory/>
     </div>
   );
 }
