@@ -38,8 +38,8 @@ function HealthMetrics() {
   return (
     <div>
       <h3>Your Health Data</h3>
-      <p>Latest Weight: {latestWeight} KG</p>
-      <p>Latest Height: {latestHeight} CM</p>
+      <p>Current Weight: {latestWeight} KG</p>
+      <p>Current Height: {latestHeight} CM</p>
       <p>Age: {healthData.age}</p>
       <p>Gender: {healthData.gender}</p>
     </div>
