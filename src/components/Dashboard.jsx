@@ -102,15 +102,15 @@ function Dashboard() {
           <h3>Edit Your Health Data</h3>
           <h4>Weight</h4>
           <WeightForm 
-            // weightId={selectedWeight ? selectedWeight._id : null} 
-            onChange={handleWeightSave}
             existingWeight={selectedWeight ? selectedWeight.weight : ''} 
+            onChange={handleWeightSave}
+            showSaveButton={true}
           />
           <h4>Height</h4>
           <HeightForm 
-            // heightId={selectedHeight ? selectedHeight._id : null} 
-            existingHeight={selectedHeight ? selectedHeight.height : ''}
+            existingHeight={selectedHeight ? selectedHeight.height : ''} 
             onChange={handleHeightSave} 
+            showSaveButton={true}
           />
         </div>
       </div>

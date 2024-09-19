@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
 
-function WeightForm({ existingWeight, onChange }) {
+function WeightForm({ existingWeight, onChange, showSaveButton }) {
   const [weight, setWeight] = useState(existingWeight || '');
 
   const handleWeightChange = (e) => {
-    setWeight(e.target.value); // Only update the local state
+    setWeight(e.target.value);
   };
 
   const handleSubmit = () => {
-    onChange(weight); // Call the save function only when user clicks "Save"
+    onChange(weight);
   };
 
-  return (
-    <div>
-      <input
-        type="number"
-        value={weight}
-        onChange={handleWeightChange}
-      />
-      <button onClick={handleSubmit}>Save Weight</button>
-    </div>
-  );
-}
+  let content;
+
+  if (showSaveButton) {
+    content = (
+      <div>
+        <input
+          type="number"
+          value={weight}
+          onChange={handleWeightChange}
+        />
+        <button onClick={handleSubmit}>Save Weight</button>
+      </div>
+    );
+  } else {
+    content = (
+      <div>
+        <input
+          type="number"
+          value={existingWeight || ''}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {showSaveButton && <button>Save</button>}
+      </div>
+    );
+  }
+
+  return <div>{content}</div>;
+  }
 
 export default WeightForm;

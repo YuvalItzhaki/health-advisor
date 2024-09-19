@@ -47,10 +47,18 @@ function InitialSetup() {
       <h2>Initial Setup</h2>
 
       <p>Please enter your initial weight.</p>
-      <WeightForm existingWeight={weightValue} onChange={(value) => setWeightValue(value)} />
+      <WeightForm 
+        existingWeight={weightValue} 
+        onChange={(value) => setWeightValue(value)} 
+        showSaveButton={false} 
+      />
 
       <p>Please enter your height.</p>
-      <HeightForm existingHeight={heightValue} onChange={(value) => setHeightValue(value)} />
+      <HeightForm 
+        existingHeight={heightValue} 
+        onChange={(value) => setHeightValue(value)} 
+        showSaveButton={false} 
+      />
 
       <p>Please enter your age.</p>
       <div>
