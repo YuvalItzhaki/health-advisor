@@ -13,8 +13,6 @@ import Cookies from 'js-cookie';
 function Dashboard() {
   const [weights, setWeights] = useState([]);
   const [heights, setHeights] = useState([]);
-  const [selectedWeight, setSelectedWeight] = useState(null);
-  const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
   const [googleId, setGoogleId] = useState(null);
   const navigate = useNavigate();
@@ -95,23 +93,7 @@ function Dashboard() {
       });
   };
 
-  const handleSaveAll = () => {
-    if (!userId && !googleId) return;
 
-    axios
-      .put(`http://localhost:5001/api/health/${userId || googleId}`, {
-        weight: selectedWeight?.weight,
-        height: selectedHeight?.height,
-      })
-      .then((response) => {
-        console.log('Health data updated:', response.data);
-        setWeights(response.data.weights || []);
-        setHeights(response.data.heights || []);
-      })
-      .catch((error) => {
-        console.error('Error saving health data:', error);
-      });
-  };
 
   return (
     <div className="dashboard">
@@ -123,14 +105,14 @@ function Dashboard() {
         <div className="metric-card">
           <h3>Edit Your Health Data</h3>
           <h4>Weight</h4>
-          <WeightForm onChange={(newWeight) => handleWeightSave(newWeight, 'weight')} showSaveButton={true} />
+          <WeightForm onChange={(newWeight) => handleSave(newWeight, 'weight')} showSaveButton={true} />
           {/* <WeightForm
             existingWeight={selectedWeight ? selectedWeight.weight : ''}
             onChange={handleWeightSave}
             showSaveButton={true}
           /> */}
           <h4>Height</h4>
-          <HeightForm onChange={(newHeight) => handleHeightSave(newHeight, 'height')} showSaveButton={true} />
+          <HeightForm onChange={(newHeight) => handleSave(newHeight, 'height')} showSaveButton={true} />
           {/* <HeightForm
             existingHeight={selectedHeight ? selectedHeight.height : ''}
             onChange={handleHeightSave}

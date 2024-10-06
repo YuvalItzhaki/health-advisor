@@ -4,54 +4,65 @@ import userStoreInstance from '../stores/UserStore';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
+
 function HealthMetrics() {
   const [healthData, setHealthData] = useState(null);
-  const storedUser = JSON.parse(localStorage.getItem('user'));
+  const storedUser = JSON.parse(localStorage.getItem('user')); // Parse the user from localStorage
   const userId = userStoreInstance.getUser()?.userId || (storedUser ? storedUser._id : null);
   const googleId = Cookies.get('googleId');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchHealthData = async (id) => {
-      try {
-        const token = localStorage.getItem('authToken') || Cookies.get('authToken');
 
+  useEffect(() => {
+    const fetchHealthData = async (id, type) => {
+      try {
+        const token = localStorage.getItem('authToken') || Cookies.get('authToken'); // This is only available in the browser
+    
         if (!token) {
           console.error('No token found. Redirecting to login...');
           navigate('/login');
           return;
         }
-
-        const apiPath = googleId ? `google/${googleId}` : `user/${userId}`;
-        const response = await axios.get(`http://localhost:5001/api/health/${apiPath}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        
+    
+        const response = await axios.get('http://localhost:5001/api/health/data/${googleId || userId}', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Send the token from localStorage
+          },
+          params: {
+            userId: id || undefined,
+            googleId: googleId || undefined,
+          },
         });
-
+    
         if (response.data) {
           setHealthData(response.data);
         } else {
-          console.log('No health data found, redirecting to initial setup.');
           navigate('/initial-setup');
         }
+    
+        console.log('Fetched healthData:', response.data);
       } catch (error) {
-        if (error.response && error.response.status === 404) {
-          console.log('No health data found, redirecting to initial setup.');
-          navigate('/initial-setup');
-        } else {
-          console.error('Error fetching health data:', error);
-        }
+        console.error('Error fetching health data:', error);
       }
     };
+    
 
-    if (userId || googleId) {
-      fetchHealthData();
+    if (userId) {
+      // Fetch health data using userId
+      fetchHealthData(userId, 'userId');
+    } else if (googleId) {
+      // If the user logs in with Google and has no userId, use googleId
+      fetchHealthData(googleId, 'googleId');
     }
-  }, [userId, googleId, navigate]);
+  }, [userId, googleId]);
 
+  // Loading state
   if (!healthData) {
     return <div>Loading health data...</div>;
   }
 
+  // Extract weights and heights from healthData
   const weights = healthData.weights || [];
   const heights = healthData.heights || [];
 

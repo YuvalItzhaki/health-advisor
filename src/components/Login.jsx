@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext'; // Adjust the path as necessary
 import { useNavigate } from 'react-router-dom';
-import  UserActions  from '../actions/UserActions'
+import  UserActions  from '../actions/UserActions';
+import GoogleFitButton from '../components/GoogleFitButton';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ function Login() {
     try {
       const response = await axios.post('http://localhost:5001/api/auth/login', { email, password });
       const userData = response.data;
+      console.log('userData is: ', userData)
   
       if (userData) {
         // Save user data to localStorage
@@ -53,6 +55,9 @@ function Login() {
           required 
         />
         <button type="submit">Login</button>
+        <GoogleFitButton/>
+        {/* <GoogleLoginComponent /> */}
+
       </form>
     </div>
   );

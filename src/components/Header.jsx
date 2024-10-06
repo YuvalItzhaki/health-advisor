@@ -39,8 +39,10 @@ function Header({ profilePicture }) {
 
   const handleLogout = () => {
     UserActions.logout();  // Call the logout action
+    localStorage.removeItem('authToken')
     navigate('/login');  // Navigate to the login page
   };
+
 
   return (
     <header className="dashboard-header">

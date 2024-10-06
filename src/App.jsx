@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { gapi } from 'gapi-script';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // import Header from './components/Header';
 import Home from './components/Home';
@@ -11,6 +12,24 @@ import {AuthProvider} from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';  // Adjust the path as necessary
 
 function App() {
+  // useEffect(() => {
+  //   function initClient() {
+  //     gapi.load('client:auth2', () => {
+  //       gapi.client.init({
+  //         clientId: '1068162461501-eiv8qv9rh7esjdhfip5sncm3fsgul276.apps.googleusercontent.com',
+  //         scope: 'https://www.googleapis.com/auth/fitness.activity.read',
+  //         redirect_uri: 'http://localhost:5173/storagerelay', 
+  //       }).then(() => {
+  //         console.log('Google API Client initialized successfully');
+  //       }).catch((error) => {
+  //         console.error('Error initializing Google API Client:', error);
+  //       });
+  //     });
+  //   }
+
+  //   initClient();
+  // }, []); // Runs once on component mount
+
   return (
     <AuthProvider>
     <Router>
@@ -25,7 +44,7 @@ function App() {
               <Dashboard />
             </ProtectedRoute>
           } />         */}
-              <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/initial-setup" element={<InitialSetup />} />
         </Routes>

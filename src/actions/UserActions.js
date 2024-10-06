@@ -1,4 +1,5 @@
 import AppDispatcher from '../dispatcher/dispatcher';
+import Cookies from 'js-cookie';
 
 const UserActions = {
   updateUser(user) {
@@ -13,6 +14,7 @@ const UserActions = {
   logout() {
     // Clear user data from localStorage on logout
     localStorage.removeItem('user');
+    Cookies.remove('googleId');
 
     AppDispatcher.dispatch({
       actionType: 'LOGOUT'

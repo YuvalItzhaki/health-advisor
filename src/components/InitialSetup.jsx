@@ -4,13 +4,13 @@ import HeightForm from './HeightForm';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import userStoreInstance from '../stores/UserStore';
+import Cookies from 'js-cookie';
 
 function InitialSetup() {
-  
-  // const user = userStoreInstance.getUser();
-  // const userId = user ? user.userId : null;  // Get only the userId from the user object
+  // Get user data from UserStore, localStorage, and Cookies
   const storedUser = JSON.parse(localStorage.getItem('user')); // Parse the user from localStorage
   const userId = userStoreInstance.getUser()?.userId || (storedUser ? storedUser._id : null);
+  const googleId = Cookies.get('googleId'); // Google ID from cookies
 
   const [weightValue, setWeightValue] = useState(''); // For storing a single weight input
   const [heightValue, setHeightValue] = useState(''); // For storing a single height input
@@ -28,7 +28,8 @@ function InitialSetup() {
     try {
       // Send a single POST request with all the data
       const response = await axios.post('http://localhost:5001/api/health/setup', {
-        userId,
+        userId: userId || undefined,  // If the user has a userId, pass it
+        googleId: googleId || undefined,  // If the user logged in with Google, pass googleId
         weights,
         heights,
         age,
@@ -36,7 +37,7 @@ function InitialSetup() {
       });
 
       console.log('Initial setup data saved:', response.data);
-      navigate('/dashboard'); 
+      navigate('/dashboard'); // Navigate to the dashboard after saving
     } catch (error) {
       console.error('Error saving initial setup data:', error);
     }

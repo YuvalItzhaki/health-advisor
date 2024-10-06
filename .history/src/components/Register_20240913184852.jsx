@@ -12,7 +12,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5001/api/users/register', { name, email, password }, { withCredentials: true });
+      const response = await axios.post('http://localhost:5001/api/users/register', { name, email, password });
       console.log('response from server: ', response.data);
 
       // Use Flux to update the user

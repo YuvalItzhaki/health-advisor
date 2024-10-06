@@ -13,8 +13,6 @@ import Cookies from 'js-cookie';
 function Dashboard() {
   const [weights, setWeights] = useState([]);
   const [heights, setHeights] = useState([]);
-  const [selectedWeight, setSelectedWeight] = useState(null);
-  const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
   const [googleId, setGoogleId] = useState(null);
   const navigate = useNavigate();
@@ -60,58 +58,7 @@ function Dashboard() {
       }
     });
   };
-  const handleWeightSave = (newWeight) => {
-    const googleIdFromCookies = Cookies.get('googleId');
-    const id = userId || googleIdFromCookies;
 
-    axios
-      .put(`http://localhost:5001/api/health/weights/${id}`, {
-        weights: [{ value: newWeight, date: new Date() }],
-      })
-      .then((response) => {
-        console.log('Weight updated:', response.data);
-        const updatedWeight = { value: newWeight, date: new Date() };
-        setWeights([...weights, updatedWeight]);
-        setSelectedWeight(updatedWeight);
-      })
-      .catch((error) => {
-        console.error('Error updating weight:', error);
-      });
-  };
-
-  const handleHeightSave = (newHeight) => {
-    axios
-      .put(`http://localhost:5001/api/health/heights/${userId || googleId}`, {
-        heights: [{ value: newHeight, date: new Date() }],
-      })
-      .then((response) => {
-        console.log('Height updated:', response.data);
-        const updatedHeight = { value: newHeight, date: new Date() };
-        setHeights([...heights, updatedHeight]);
-        setSelectedHeight(updatedHeight);
-      })
-      .catch((error) => {
-        console.error('Error updating height:', error);
-      });
-  };
-
-  const handleSaveAll = () => {
-    if (!userId && !googleId) return;
-
-    axios
-      .put(`http://localhost:5001/api/health/${userId || googleId}`, {
-        weight: selectedWeight?.weight,
-        height: selectedHeight?.height,
-      })
-      .then((response) => {
-        console.log('Health data updated:', response.data);
-        setWeights(response.data.weights || []);
-        setHeights(response.data.heights || []);
-      })
-      .catch((error) => {
-        console.error('Error saving health data:', error);
-      });
-  };
 
   return (
     <div className="dashboard">
@@ -123,22 +70,20 @@ function Dashboard() {
         <div className="metric-card">
           <h3>Edit Your Health Data</h3>
           <h4>Weight</h4>
-          <WeightForm onChange={(newWeight) => handleWeightSave(newWeight, 'weight')} showSaveButton={true} />
-          {/* <WeightForm
+          <WeightForm
             existingWeight={selectedWeight ? selectedWeight.weight : ''}
             onChange={handleWeightSave}
             showSaveButton={true}
-          /> */}
+          />
           <h4>Height</h4>
-          <HeightForm onChange={(newHeight) => handleHeightSave(newHeight, 'height')} showSaveButton={true} />
-          {/* <HeightForm
+          <HeightForm
             existingHeight={selectedHeight ? selectedHeight.height : ''}
             onChange={handleHeightSave}
             showSaveButton={true}
-          /> */}
+          />
         </div>
       </div>
-      {/* <button onClick={handleSaveAll}>Save All</button> */}
+      <button onClick={handleSaveAll}>Save All</button>
       <HealthHistory />
     </div>
   );
