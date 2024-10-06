@@ -16,6 +16,7 @@ function Dashboard() {
   const [selectedWeight, setSelectedWeight] = useState(null);
   const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [googleId, setGoogleId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +25,8 @@ function Dashboard() {
     const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
     const googleIdFromCookies = Cookies.get('googleId');
     const authToken = localStorage.getItem('authToken') || Cookies.get('authToken');
+    console.log('storedUserId', storedUserId)
+
 
     if (!authToken) {
       console.log('No authToken, redirecting to login.');
@@ -42,35 +45,26 @@ function Dashboard() {
   }, [navigate]);
 
   const fetchHealthData = (apiPath, authToken) => {
-    axios
-      .get(`http://localhost:5001/api/health/${apiPath}`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      })
-      .then((response) => {
-        const healthData = response.data;
-        setWeights(healthData.weights || []);
-        setHeights(healthData.heights || []);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 404) {
-          console.log('No health data found, redirecting to initial setup.');
-          navigate('/initial-setup');
-        } else {
-          console.error('Error fetching health data:', error);
-        }
-      });
+    axios.get(`http://localhost:5001/api/health/${apiPath}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    })
+    .then((response) => {
+      const healthData = response.data;
+      setWeights(healthData.weights || []);
+      setHeights(healthData.heights || []);
+    })
+    .catch((error) => {
+      if (error.response && error.response.status === 404) {
+        console.log('No health data found, redirecting to initial setup.');
+        navigate('/initial-setup');
+      } else {
+        console.error('Error fetching health data:', error);
+      }
+    });
   };
-
-  const getUserIdOrGoogleId = () => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    const userFromStore = userStoreInstance.getUser();
-    const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
-    const googleIdFromCookies = Cookies.get('googleId');
-    return storedUserId || googleIdFromCookies;
-  };
-
   const handleWeightSave = (newWeight) => {
-    const id = getUserIdOrGoogleId();
+    const googleIdFromCookies = Cookies.get('googleId');
+    const id = userId || googleIdFromCookies;
 
     axios
       .put(`http://localhost:5001/api/health/weights/${id}`, {
@@ -88,10 +82,8 @@ function Dashboard() {
   };
 
   const handleHeightSave = (newHeight) => {
-    const id = getUserIdOrGoogleId();
-
     axios
-      .put(`http://localhost:5001/api/health/heights/${id}`, {
+      .put(`http://localhost:5001/api/health/heights/${userId || googleId}`, {
         heights: [{ value: newHeight, date: new Date() }],
       })
       .then((response) => {
@@ -105,6 +97,24 @@ function Dashboard() {
       });
   };
 
+  const handleSaveAll = () => {
+    if (!userId && !googleId) return;
+
+    axios
+      .put(`http://localhost:5001/api/health/${userId || googleId}`, {
+        weight: selectedWeight?.weight,
+        height: selectedHeight?.height,
+      })
+      .then((response) => {
+        console.log('Health data updated:', response.data);
+        setWeights(response.data.weights || []);
+        setHeights(response.data.heights || []);
+      })
+      .catch((error) => {
+        console.error('Error saving health data:', error);
+      });
+  };
+
   return (
     <div className="dashboard">
       <Header userName={userStoreInstance.getUser()?.name} />
@@ -115,11 +125,22 @@ function Dashboard() {
         <div className="metric-card">
           <h3>Edit Your Health Data</h3>
           <h4>Weight</h4>
-          <WeightForm onChange={(newWeight) => handleWeightSave(newWeight)} showSaveButton={true} />
+          <WeightForm onChange={(newWeight) => handleWeightSave(newWeight, 'weight')} showSaveButton={true} />
+          {/* <WeightForm
+            existingWeight={selectedWeight ? selectedWeight.weight : ''}
+            onChange={handleWeightSave}
+            showSaveButton={true}
+          /> */}
           <h4>Height</h4>
-          <HeightForm onChange={(newHeight) => handleHeightSave(newHeight)} showSaveButton={true} />
+          <HeightForm onChange={(newHeight) => handleHeightSave(newHeight, 'height')} showSaveButton={true} />
+          {/* <HeightForm
+            existingHeight={selectedHeight ? selectedHeight.height : ''}
+            onChange={handleHeightSave}
+            showSaveButton={true}
+          /> */}
         </div>
       </div>
+      {/* <button onClick={handleSaveAll}>Save All</button> */}
       <HealthHistory />
     </div>
   );

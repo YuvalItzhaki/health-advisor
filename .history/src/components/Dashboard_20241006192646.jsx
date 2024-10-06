@@ -24,6 +24,7 @@ function Dashboard() {
     const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
     const googleIdFromCookies = Cookies.get('googleId');
     const authToken = localStorage.getItem('authToken') || Cookies.get('authToken');
+    console.log('storedUserId', storedUserId);
 
     if (!authToken) {
       console.log('No authToken, redirecting to login.');
