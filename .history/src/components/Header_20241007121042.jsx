@@ -40,7 +40,7 @@ function Header({ profilePicture }) {
 
   const handleLogout = () => {
     UserActions.logout();  // Call the logout action
-    Cookies.remove('authToken', { path: '/', secure: true, sameSite: 'strict' });
+    // Cookies.remove('authToken', { path: '/', secure: true, sameSite: 'strict' });
     localStorage.removeItem('authToken')
     navigate('/login');  // Navigate to the login page
   };

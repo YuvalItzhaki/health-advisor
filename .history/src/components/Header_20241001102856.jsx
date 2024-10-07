@@ -4,7 +4,6 @@ import logo from '../assets/logo/logo.webp';
 import UserStore from '../stores/UserStore';  // Import the Flux store for user data
 import UserActions from '../actions/UserActions';  // Import user-related actions
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 
 function Header({ profilePicture }) {
   const [name, setName] = useState('');  // Initialize name state
@@ -40,7 +39,6 @@ function Header({ profilePicture }) {
 
   const handleLogout = () => {
     UserActions.logout();  // Call the logout action
-    Cookies.remove('authToken', { path: '/', secure: true, sameSite: 'strict' });
     localStorage.removeItem('authToken')
     navigate('/login');  // Navigate to the login page
   };
