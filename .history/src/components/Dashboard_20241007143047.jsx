@@ -19,8 +19,6 @@ function Dashboard() {
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
   const { fitData, error } = googleFitData();
-  if (error) return <div>Error: {error}</div>;
-  if (!fitData) return <div>Loading Google Fit data...</div>;
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -122,10 +120,6 @@ function Dashboard() {
           <WeightForm onChange={(newWeight) => handleWeightSave(newWeight)} showSaveButton={true} />
           <h4>Height</h4>
           <HeightForm onChange={(newHeight) => handleHeightSave(newHeight)} showSaveButton={true} />
-        </div>
-        <div>
-          <h2>Google Fit Data</h2>
-          <pre>{JSON.stringify(fitData, null, 2)}</pre>
         </div>
       </div>
       <HealthHistory />
