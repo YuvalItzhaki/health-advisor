@@ -100,7 +100,6 @@ function Dashboard() {
   };
 
   const handleRefreshData = () => {
-    console.log('Refresh data from google fit')
     fetchGoogleFitData(); // Call the fetch function on button click
   };
 

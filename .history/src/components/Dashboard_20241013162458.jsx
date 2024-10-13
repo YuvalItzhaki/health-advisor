@@ -99,8 +99,7 @@ function Dashboard() {
       });
   };
 
-  const handleRefreshData = () => {
-    console.log('Refresh data from google fit')
+  const handleRefreshSteps = () => {
     fetchGoogleFitData(); // Call the fetch function on button click
   };
 
@@ -123,7 +122,7 @@ function Dashboard() {
           {error && <p>{error}</p>}
           <p>Steps: {fitData.steps > 0 ? fitData.steps : 'No steps data available.'}</p>
           <p>Calories: {fitData.calories > 0 ? fitData.calories.toFixed(2) : 'No calories data available.'}</p>
-          <button onClick={handleRefreshData}>Refresh Data</button>
+          <button onClick={handleRefreshSteps}>Refresh Data</button> {/* Call handleRefreshSteps */}
         </div>
       </div>
       <HealthHistory />

@@ -50,7 +50,7 @@ const useGoogleFitData = () => {
 
       // Extract steps and calories data
       const steps = response.data.bucket[0]?.dataset[0]?.point[0]?.value[0]?.intVal || 0;
-      const calories = response.data.bucket[0]?.dataset[1]?.point[0]?.value[0]?.fpVal || 0; // Change index to 0 for bucket
+      const calories = response.data.bucket[1]?.dataset[0]?.point[0]?.value[0]?.fpVal || 0;
 
       setFitData({ steps, calories });
 

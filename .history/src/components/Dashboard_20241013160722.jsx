@@ -17,8 +17,19 @@ function Dashboard() {
   const [selectedWeight, setSelectedWeight] = useState(null);
   const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [fitDataSteps, setFitDataSteps] = useState(0);
   const navigate = useNavigate();
   const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
+
+  // Update steps when fitData changes
+  useEffect(() => {
+    if (fitData?.bucket?.[0]?.dataset?.[0]?.point?.[0]?.value?.[0]?.intVal) {
+      const steps = fitData.bucket[0].dataset[0].point[0].value[0].intVal;
+      if (steps !== fitDataSteps) {
+        setFitDataSteps(steps); // Only update if steps have changed
+      }
+    }
+  }, [fitData, fitDataSteps]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -63,6 +74,14 @@ function Dashboard() {
       });
   };
 
+  const getUserIdOrGoogleId = () => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const userFromStore = userStoreInstance.getUser();
+    const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
+    const googleIdFromCookies = Cookies.get('googleId');
+    return storedUserId || googleIdFromCookies;
+  };
+
   const handleWeightSave = (newWeight) => {
     const id = getUserIdOrGoogleId();
 
@@ -99,8 +118,7 @@ function Dashboard() {
       });
   };
 
-  const handleRefreshData = () => {
-    console.log('Refresh data from google fit')
+  const handleRefreshSteps = () => {
     fetchGoogleFitData(); // Call the fetch function on button click
   };
 
@@ -121,9 +139,12 @@ function Dashboard() {
         <div>
           <h2>Google Fit Data</h2>
           {error && <p>{error}</p>}
-          <p>Steps: {fitData.steps > 0 ? fitData.steps : 'No steps data available.'}</p>
-          <p>Calories: {fitData.calories > 0 ? fitData.calories.toFixed(2) : 'No calories data available.'}</p>
-          <button onClick={handleRefreshData}>Refresh Data</button>
+          {fitDataSteps > 0 ? (
+            <p>Steps: {fitDataSteps}</p>
+          ) : (
+            <p>No steps data available.</p>
+          )}
+          <button onClick={handleRefreshSteps}>Refresh Steps</button> {/* Call handleRefreshSteps */}
         </div>
       </div>
       <HealthHistory />
