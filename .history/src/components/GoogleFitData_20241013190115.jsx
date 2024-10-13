@@ -25,6 +25,7 @@ const useGoogleFitData = () => {
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       const endOfToday = now.getTime();
 
+      // Use the access token to fetch Google Fit data with a POST request
       const response = await axios.post('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
         {
           "aggregateBy": [
