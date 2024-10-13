@@ -9,7 +9,8 @@ import '../style/Dashboard.css';
 import userStoreInstance from '../stores/UserStore';
 import HealthHistory from './HealthHistory';
 import Cookies from 'js-cookie';
-import useGoogleFitData from './GoogleFitData'; // Update the import to reflect the hook name
+import googleFitData from './GoogleFitData';
+
 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
@@ -17,19 +18,11 @@ function Dashboard() {
   const [selectedWeight, setSelectedWeight] = useState(null);
   const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [fitDataSteps, setFitDataSteps] = useState(0);
+  const [isLoadingFitData, setIsLoadingFitData] = useState(false);
   const navigate = useNavigate();
-  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
-
-  // Update steps when fitData changes
-  useEffect(() => {
-    if (fitData?.bucket?.[0]?.dataset?.[0]?.point?.[0]?.value?.[0]?.intVal) {
-      const steps = fitData.bucket[0].dataset[0].point[0].value[0].intVal;
-      if (steps !== fitDataSteps) {
-        setFitDataSteps(steps); // Only update if steps have changed
-      }
-    }
-  }, [fitData, fitDataSteps]);
+  const { fitData, error } = googleFitData();
+  if (error) return <div>Error: {error}</div>;
+  if (!fitData) return <div>Loading Google Fit data...</div>;
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -118,10 +111,6 @@ function Dashboard() {
       });
   };
 
-  const handleRefreshSteps = () => {
-    fetchGoogleFitData(); // Call the fetch function on button click
-  };
-
   return (
     <div className="dashboard">
       <Header userName={userStoreInstance.getUser()?.name} />
@@ -137,14 +126,12 @@ function Dashboard() {
           <HeightForm onChange={(newHeight) => handleHeightSave(newHeight)} showSaveButton={true} />
         </div>
         <div>
-          <h2>Google Fit Steps Data</h2>
-          {error && <p>{error}</p>}
-          {fitDataSteps > 0 ? (
-            <p>Steps: {fitDataSteps}</p>
+          <h2>Google Fit Data</h2>
+          {isLoadingFitData ? (
+            <p>Loading Google Fit data...</p>
           ) : (
-            <p>No steps data available.</p>
+            <pre>{JSON.stringify(fitData, null, 2)}</pre>
           )}
-          <button onClick={handleRefreshSteps}>Refresh Steps</button> {/* Call handleRefreshSteps */}
         </div>
       </div>
       <HealthHistory />

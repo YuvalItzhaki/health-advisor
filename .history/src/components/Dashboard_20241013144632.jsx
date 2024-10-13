@@ -9,7 +9,7 @@ import '../style/Dashboard.css';
 import userStoreInstance from '../stores/UserStore';
 import HealthHistory from './HealthHistory';
 import Cookies from 'js-cookie';
-import useGoogleFitData from './GoogleFitData'; // Update the import to reflect the hook name
+import googleFitData from './GoogleFitData';
 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
@@ -18,19 +18,11 @@ function Dashboard() {
   const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
   const [fitDataSteps, setFitDataSteps] = useState(0);
+  const [isLoadingFitData, setIsLoadingFitData] = useState(false);
   const navigate = useNavigate();
-  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
+  const { fitData, error } = googleFitData();
 
-  // Update steps when fitData changes
-  useEffect(() => {
-    if (fitData?.bucket?.[0]?.dataset?.[0]?.point?.[0]?.value?.[0]?.intVal) {
-      const steps = fitData.bucket[0].dataset[0].point[0].value[0].intVal;
-      if (steps !== fitDataSteps) {
-        setFitDataSteps(steps); // Only update if steps have changed
-      }
-    }
-  }, [fitData, fitDataSteps]);
-
+  // Fetch initial health data and fit data on mount
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const userFromStore = userStoreInstance.getUser();
@@ -52,7 +44,30 @@ function Dashboard() {
       console.log('No userId or googleId, redirecting to login.');
       navigate('/login');
     }
+
+    // Fetch fit data
+    fetchFitData();
   }, [navigate]);
+
+  // Function to fetch Google Fit data
+  const fetchFitData = () => {
+    setIsLoadingFitData(true); // Set loading state
+
+    const authToken = localStorage.getItem('authToken') || Cookies.get('authToken');
+    
+    axios.get('YOUR_GOOGLE_FIT_API_ENDPOINT', {
+      headers: { Authorization: `Bearer ${authToken}` },
+    })
+    .then((response) => {
+      const steps = response.data.bucket[0].dataset[0].point[0]?.value[0]?.intVal || 0;
+      setFitDataSteps(steps);
+      setIsLoadingFitData(false); // Reset loading state
+    })
+    .catch((error) => {
+      console.error('Error fetching Google Fit data:', error);
+      setIsLoadingFitData(false); // Reset loading state on error
+    });
+  };
 
   const fetchHealthData = (apiPath, authToken) => {
     axios
@@ -118,10 +133,6 @@ function Dashboard() {
       });
   };
 
-  const handleRefreshSteps = () => {
-    fetchGoogleFitData(); // Call the fetch function on button click
-  };
-
   return (
     <div className="dashboard">
       <Header userName={userStoreInstance.getUser()?.name} />
@@ -138,13 +149,19 @@ function Dashboard() {
         </div>
         <div>
           <h2>Google Fit Steps Data</h2>
-          {error && <p>{error}</p>}
-          {fitDataSteps > 0 ? (
-            <p>Steps: {fitDataSteps}</p>
+          {isLoadingFitData ? (
+            <p>Loading steps data...</p>
           ) : (
-            <p>No steps data available.</p>
+            <>
+              {error && <p>{error}</p>}
+              {fitDataSteps > 0 ? (
+                <p>Steps: {fitDataSteps}</p>
+              ) : (
+                <p>No steps data available.</p>
+              )}
+              <button onClick={fetchFitData}>Refresh Steps</button>
+            </>
           )}
-          <button onClick={handleRefreshSteps}>Refresh Steps</button> {/* Call handleRefreshSteps */}
         </div>
       </div>
       <HealthHistory />

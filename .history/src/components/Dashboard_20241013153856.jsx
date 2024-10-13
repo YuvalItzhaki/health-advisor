@@ -9,7 +9,7 @@ import '../style/Dashboard.css';
 import userStoreInstance from '../stores/UserStore';
 import HealthHistory from './HealthHistory';
 import Cookies from 'js-cookie';
-import useGoogleFitData from './GoogleFitData'; // Update the import to reflect the hook name
+import googleFitData from './GoogleFitData';
 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
@@ -18,8 +18,9 @@ function Dashboard() {
   const [selectedHeight, setSelectedHeight] = useState(null);
   const [userId, setUserId] = useState(null);
   const [fitDataSteps, setFitDataSteps] = useState(0);
+  const [isLoadingFitData, setIsLoadingFitData] = useState(false);
   const navigate = useNavigate();
-  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
+  const { fitData, error } = googleFitData();
 
   // Update steps when fitData changes
   useEffect(() => {
@@ -28,9 +29,8 @@ function Dashboard() {
       if (steps !== fitDataSteps) {
         setFitDataSteps(steps); // Only update if steps have changed
       }
-    }
+    }    
   }, [fitData, fitDataSteps]);
-
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const userFromStore = userStoreInstance.getUser();
@@ -118,10 +118,6 @@ function Dashboard() {
       });
   };
 
-  const handleRefreshSteps = () => {
-    fetchGoogleFitData(); // Call the fetch function on button click
-  };
-
   return (
     <div className="dashboard">
       <Header userName={userStoreInstance.getUser()?.name} />
@@ -144,7 +140,7 @@ function Dashboard() {
           ) : (
             <p>No steps data available.</p>
           )}
-          <button onClick={handleRefreshSteps}>Refresh Steps</button> {/* Call handleRefreshSteps */}
+          <button onClick={googleFitData}>Refresh Steps</button>
         </div>
       </div>
       <HealthHistory />
