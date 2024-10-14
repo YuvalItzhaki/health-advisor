@@ -73,10 +73,10 @@ function Dashboard() {
 
   const handleWeightSave = (newWeight) => {
     const id = getUserIdOrGoogleId();
-
+  
     axios
-      .put(`http://localhost:5001/api/health/weights/${id}`, {
-        weights: [{ value: newWeight, date: new Date() }],
+      .put(`http://localhost:5001/api/health/update/weights/${id}`, {
+        value: { value: newWeight, date: new Date() }, // Sending 'value' field
       })
       .then((response) => {
         console.log('Weight updated:', response.data);
@@ -88,13 +88,14 @@ function Dashboard() {
         console.error('Error updating weight:', error);
       });
   };
+  
 
   const handleHeightSave = (newHeight) => {
     const id = getUserIdOrGoogleId();
-
+  
     axios
-      .put(`http://localhost:5001/api/health/heights/${id}`, {
-        heights: [{ value: newHeight, date: new Date() }],
+      .put(`http://localhost:5001/api/health/update/heights/${id}`, {
+        value: { value: newHeight, date: new Date() }, // Sending 'value' field
       })
       .then((response) => {
         console.log('Height updated:', response.data);
@@ -106,6 +107,7 @@ function Dashboard() {
         console.error('Error updating height:', error);
       });
   };
+  
 
   const handleRefreshData = () => {
     console.log('Refresh data from google fit')

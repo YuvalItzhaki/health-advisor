@@ -75,11 +75,11 @@ function Dashboard() {
     const id = getUserIdOrGoogleId();
 
     axios
-      .put(`http://localhost:5001/api/health/weights/${id}`, {
+      .put(`http://localhost:5001/api/health/update/weights/${id}`, {
         weights: [{ value: newWeight, date: new Date() }],
       })
       .then((response) => {
-        console.log('Weight updated:', response.data);
+        console.log('Weight updated:', response.data.weights);
         const updatedWeight = { value: newWeight, date: new Date() };
         setWeights([...weights, updatedWeight]);
         setSelectedWeight(updatedWeight);
@@ -93,7 +93,7 @@ function Dashboard() {
     const id = getUserIdOrGoogleId();
 
     axios
-      .put(`http://localhost:5001/api/health/heights/${id}`, {
+      .put(`http://localhost:5001/api/health/update/heights/${id}`, {
         heights: [{ value: newHeight, date: new Date() }],
       })
       .then((response) => {

@@ -75,7 +75,7 @@ function Dashboard() {
     const id = getUserIdOrGoogleId();
 
     axios
-      .put(`http://localhost:5001/api/health/weights/${id}`, {
+      .put(`http://localhost:5001/api/update/weights/${id}`, {
         weights: [{ value: newWeight, date: new Date() }],
       })
       .then((response) => {
@@ -93,7 +93,7 @@ function Dashboard() {
     const id = getUserIdOrGoogleId();
 
     axios
-      .put(`http://localhost:5001/api/health/heights/${id}`, {
+      .put(`http://localhost:5001/api/update/heights/${id}`, {
         heights: [{ value: newHeight, date: new Date() }],
       })
       .then((response) => {
