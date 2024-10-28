@@ -20,13 +20,10 @@ function Header({ profilePicture }) {
       if (googleId) {
         try {
           // Fetch user info from backend using googleId
-          const response = await axios.get(`http://localhost:5001/api/users/googleId/${googleId}`);
-          const { email } = response.data;
+          const response = await axios.get(`/api/users/google/${googleId}`);
+          const { name, email } = response.data;  // Assuming backend responds with user data
+          setName(name);
           setEmail(email);
-          
-          // If no name available, use the part before '@' in email as name
-          const userName = email ? email.split('@')[0] : '';
-          setName(userName);
         } catch (error) {
           console.error("Error fetching Google user data:", error);
         }
@@ -35,6 +32,7 @@ function Header({ profilePicture }) {
         const user = UserStore.getUser();
         if (user) {
           setName(user.name);
+          setEmail(user.email);
         } else {
           const storedUser = localStorage.getItem('user');
           if (storedUser) {
@@ -56,12 +54,10 @@ function Header({ profilePicture }) {
     };
   }, []);
 
-  const handleLogout = async () => {
-    await axios.post('http://localhost:5001/api/users/logout');
+  const handleLogout = () => {
     UserActions.logout();
-    Cookies.remove('authToken');
-    Cookies.remove('connect.sid');
-    // Cookies.remove('googleId');
+    Cookies.remove('authToken', { path: '/', secure: true, sameSite: 'strict' });
+    Cookies.remove('googleId');  // Remove googleId cookie on logout
     localStorage.removeItem('authToken');
     navigate('/login');
   };
@@ -74,7 +70,8 @@ function Header({ profilePicture }) {
       </div>
 
       <div className="center-section">
-        <h2 className="welcome-message">Welcome, {name}!</h2> {/* Display the name or email-based string */}
+        <h2 className="welcome-message">Welcome, {name}!</h2>
+        {email && <p>Email: {email}</p>}  {/* Display email if available */}
       </div>
 
       <div className="right-section">

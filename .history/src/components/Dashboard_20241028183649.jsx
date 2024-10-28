@@ -14,11 +14,11 @@ import useGoogleFitData from './GoogleFitData'; // Update the import to reflect 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
   const [heights, setHeights] = useState([]);
-  // const [selectedWeight, setSelectedWeight] = useState(null);
-  // const [selectedHeight, setSelectedHeight] = useState(null);
-  // const [userId, setUserId] = useState(null);
+  const [selectedWeight, setSelectedWeight] = useState(null);
+  const [selectedHeight, setSelectedHeight] = useState(null);
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
-  // const googleIdFromCookies = Cookies.get('googleId');
+  const googleIdFromCookies = Cookies.get('googleId');
   const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
 
   useEffect(() => {
@@ -127,7 +127,7 @@ function Dashboard() {
           <h4>Height</h4>
           <HeightForm onChange={(newHeight) => handleHeightSave(newHeight)} showSaveButton={true} />
         </div>
-        {Cookies.get('googleId') && (
+        {googleIdFromCookies && (
         <div>
           <h2>Google Fit Data</h2>
           {error && <p>{error}</p>}

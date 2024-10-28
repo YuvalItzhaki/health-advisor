@@ -59,7 +59,7 @@ function Header({ profilePicture }) {
   const handleLogout = async () => {
     await axios.post('http://localhost:5001/api/users/logout');
     UserActions.logout();
-    Cookies.remove('authToken');
+    // Cookies.remove('authToken');
     Cookies.remove('connect.sid');
     // Cookies.remove('googleId');
     localStorage.removeItem('authToken');

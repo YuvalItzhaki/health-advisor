@@ -9,23 +9,22 @@ import '../style/Dashboard.css';
 import userStoreInstance from '../stores/UserStore';
 import HealthHistory from './HealthHistory';
 import Cookies from 'js-cookie';
-import useGoogleFitData from './GoogleFitData'; // Update the import to reflect the hook name
+import useGoogleFitData from './GoogleFitData';
 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
   const [heights, setHeights] = useState([]);
-  // const [selectedWeight, setSelectedWeight] = useState(null);
-  // const [selectedHeight, setSelectedHeight] = useState(null);
-  // const [userId, setUserId] = useState(null);
+  const [selectedWeight, setSelectedWeight] = useState(null);
+  const [selectedHeight, setSelectedHeight] = useState(null);
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
-  // const googleIdFromCookies = Cookies.get('googleId');
-  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
+  const googleIdFromCookies = Cookies.get('googleId');
+  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(Boolean(googleIdFromCookies)); // Only fetch if googleId exists
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const userFromStore = userStoreInstance.getUser();
     const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
-    const googleIdFromCookies = Cookies.get('googleId');
     const authToken = localStorage.getItem('authToken') || Cookies.get('authToken');
 
     if (!authToken) {
@@ -36,7 +35,6 @@ function Dashboard() {
 
     if (googleIdFromCookies) {
       fetchHealthData(`google/${googleIdFromCookies}`, authToken);
-      fetchGoogleFitData();
     } else if (storedUserId) {
       fetchHealthData(`user/${storedUserId}`, authToken);
     } else {
@@ -65,19 +63,11 @@ function Dashboard() {
       });
   };
 
-  const getUserIdOrGoogleId = () => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    const userFromStore = userStoreInstance.getUser();
-    const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
-    const googleIdFromCookies = Cookies.get('googleId');
-    return storedUserId || googleIdFromCookies;
-  };
-
   const handleWeightSave = (newWeight) => {
-    const id = getUserIdOrGoogleId();
-  
+    const id = googleIdFromCookies || userId;
+
     axios.put(`http://localhost:5001/api/health/update/weights/${id}`, {
-        value: { value: newWeight, date: new Date() }, // Sending 'value' field
+        value: { value: newWeight, date: new Date() },
       })
       .then((response) => {
         console.log('Weight updated:', response.data);
@@ -89,11 +79,10 @@ function Dashboard() {
         console.error('Error updating weight:', error);
       });
   };
-  
 
   const handleHeightSave = (newHeight) => {
-    const id = getUserIdOrGoogleId();
-  
+    const id = googleIdFromCookies || userId;
+
     axios.put(`http://localhost:5001/api/health/update/heights/${id}`, {
         value: { value: newHeight, date: new Date() },
       })
@@ -107,10 +96,11 @@ function Dashboard() {
         console.error('Error updating height:', error);
       });
   };
-  
+
   const handleRefreshData = () => {
-    console.log('Refresh data from google fit')
-    fetchGoogleFitData();
+    if (googleIdFromCookies) {
+      fetchGoogleFitData();
+    }
   };
 
   return (
@@ -127,14 +117,14 @@ function Dashboard() {
           <h4>Height</h4>
           <HeightForm onChange={(newHeight) => handleHeightSave(newHeight)} showSaveButton={true} />
         </div>
-        {Cookies.get('googleId') && (
-        <div>
-          <h2>Google Fit Data</h2>
-          {error && <p>{error}</p>}
-          <p>Steps: {fitData.steps > 0 ? fitData.steps : 'No steps data available.'}</p>
-          <p>Calories: {fitData.calories > 0 ? fitData.calories.toFixed(2) : 'No calories data available.'}</p>
-          <button onClick={handleRefreshData}>Refresh Data</button>
-        </div>
+        {googleIdFromCookies && (
+          <div>
+            <h2>Google Fit Data</h2>
+            {error && <p>{error}</p>}
+            <p>Steps: {fitData.steps > 0 ? fitData.steps : 'No steps data available.'}</p>
+            <p>Calories: {fitData.calories > 0 ? fitData.calories.toFixed(2) : 'No calories data available.'}</p>
+            <button onClick={handleRefreshData}>Refresh Data</button>
+          </div>
         )}
       </div>
       <HealthHistory />

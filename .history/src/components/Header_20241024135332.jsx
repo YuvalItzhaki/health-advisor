@@ -21,7 +21,8 @@ function Header({ profilePicture }) {
         try {
           // Fetch user info from backend using googleId
           const response = await axios.get(`http://localhost:5001/api/users/googleId/${googleId}`);
-          const { email } = response.data;
+          console.log('response is: ', response)
+          const { email } = response.data;  // Assume the backend sends back email
           setEmail(email);
           
           // If no name available, use the part before '@' in email as name
@@ -56,12 +57,10 @@ function Header({ profilePicture }) {
     };
   }, []);
 
-  const handleLogout = async () => {
-    await axios.post('http://localhost:5001/api/users/logout');
+  const handleLogout = () => {
     UserActions.logout();
-    Cookies.remove('authToken');
-    Cookies.remove('connect.sid');
-    // Cookies.remove('googleId');
+    Cookies.remove('authToken', { path: '/', secure: true, sameSite: 'strict' });
+    Cookies.remove('googleId');  // Remove googleId cookie on logout
     localStorage.removeItem('authToken');
     navigate('/login');
   };

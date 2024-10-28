@@ -56,12 +56,10 @@ function Header({ profilePicture }) {
     };
   }, []);
 
-  const handleLogout = async () => {
-    await axios.post('http://localhost:5001/api/users/logout');
+  const handleLogout = () => {
     UserActions.logout();
-    Cookies.remove('authToken');
-    Cookies.remove('connect.sid');
-    // Cookies.remove('googleId');
+    Cookies.remove('authToken', { path: '/', secure: true, sameSite: 'strict' });
+    Cookies.remove('googleId');  // Remove googleId cookie on logout
     localStorage.removeItem('authToken');
     navigate('/login');
   };

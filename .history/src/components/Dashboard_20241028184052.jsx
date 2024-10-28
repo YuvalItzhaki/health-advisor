@@ -14,24 +14,24 @@ import useGoogleFitData from './GoogleFitData'; // Update the import to reflect 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
   const [heights, setHeights] = useState([]);
-  // const [selectedWeight, setSelectedWeight] = useState(null);
-  // const [selectedHeight, setSelectedHeight] = useState(null);
-  // const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
-  // const googleIdFromCookies = Cookies.get('googleId');
-  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
+  const { fitData, error, fetchGoogleFitData } = useGoogleFitData();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    const userFromStore = userStoreInstance.getUser();
-    const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
-    const googleIdFromCookies = Cookies.get('googleId');
     const authToken = localStorage.getItem('authToken') || Cookies.get('authToken');
+    const userId = getUserIdOrGoogleId();
 
     if (!authToken) {
       console.log('No authToken, redirecting to login.');
       navigate('/login');
       return;
+    }
+    if (userId) {
+      fetchHealthData(userId, authToken);
+      if (Cookies.get('googleId')) fetchGoogleFitData();
+    } else {
+      console.log('No userId or googleId, redirecting to login.');
+      navigate('/login');
     }
 
     if (googleIdFromCookies) {
