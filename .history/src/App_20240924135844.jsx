@@ -10,8 +10,6 @@ import Navbar from './components/Navbar';
 import InitialSetup from './components/InitialSetup';
 import {AuthProvider} from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';  // Adjust the path as necessary
-import ActivityContainer from './components/ActivityContainer';
-
 
 function App() {
   // useEffect(() => {
@@ -46,7 +44,6 @@ function App() {
               <Dashboard />
             </ProtectedRoute>
           } />         */}
-          <Route path="/activity" element={<ActivityContainer />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/initial-setup" element={<InitialSetup />} />

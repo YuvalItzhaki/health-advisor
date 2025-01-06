@@ -11,8 +11,6 @@ import HealthHistory from './HealthHistory';
 import Cookies from 'js-cookie';
 import useGoogleFitData from './GoogleFitData';
 import ActivityMap from './ActivityMap';
-import ActivityContainer from './ActivityContainer';
-
 
 
 function Dashboard() {
@@ -143,9 +141,6 @@ function Dashboard() {
           <p>Steps: {fitData.steps > 0 ? fitData.steps : 'No steps data available.'}</p>
           <p>Calories: {fitData.calories > 0 ? fitData.calories.toFixed(2) : 'No calories data available.'}</p>
           <button onClick={handleRefreshData}>Refresh Data</button>
-          <h2>Activity Location</h2>
-          <ActivityContainer />
-          <ActivityMap activityLocation={activityLocation} />
         </div>
         )}
       </div>

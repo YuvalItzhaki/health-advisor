@@ -124,37 +124,27 @@ const useGoogleFitData = (shouldFetch) => {
 
   const fetchSessionRouteData = async (accessToken) => {
     try {
-      // Fetch sessions
+      // Fetch sessions to find a specific session (e.g., "Afternoon walk")
       const sessionsResponse = await axios.get('http://localhost:5001/api/googleFit/sessions', {
         params: { accessToken },
       });
-  
-      const sessions = sessionsResponse.data.session || []; 
-  
-      if (!Array.isArray(sessions)) {
-        console.error('Sessions data is not an array:', sessionsResponse.data);
-        setError('Error fetching session data: Sessions data is not an array.');
+
+      const sessions = sessionsResponse.data;
+      console.log('yuval', sessions)
+      const afternoonWalk = sessions.find((session) => session.name === 'Evening walk');
+      const afternoonBike = sessions.find((session) => session.name === 'Afternoon bike');
+
+      if (!afternoonWalk) {
+        console.error('Afternoon walk session not found.');
         return;
       }
-  
-      if (sessions.length === 0) {
-        console.log('No sessions found for the last month.');
-        setError('No sessions found for the last month.');
+      if (!afternoonBike) {
+        console.error('Afternoon bike session not found.');
         return;
       }
-  
-      // Find a specific session (e.g., "Walking" or "Cycling")
-      const walkingSession = sessions.find((session) => session.activityType === 'walking');
-      const cyclingSession = sessions.find((session) => session.activityType === 'cycling');
-  
-      if (!walkingSession && !cyclingSession) {
-        console.log('No walking or cycling sessions found.');
-        setError('No walking or cycling sessions found.');
-        return;
-      }
-  
-      const selectedSession = walkingSession || cyclingSession; 
-      const { id, startTimeMillis, endTimeMillis } = selectedSession;
+
+      // Fetch route data for the Afternoon walk session
+      const { id, startTimeMillis, endTimeMillis } = afternoonWalk;
       const routeResponse = await axios.get('http://localhost:5001/api/googleFit/session-route', {
         params: { accessToken, sessionId: id, startTimeMillis, endTimeMillis },
       });
