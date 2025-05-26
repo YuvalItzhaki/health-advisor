@@ -1,91 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import '../style/Header.css';
-import logo from '../assets/logo/logo.webp';
-import UserStore from '../stores/UserStore';  // Import the Flux store for user data
-import UserActions from '../actions/UserActions';  // Import user-related actions
-import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import axios from 'axios';  // Assuming you're using Axios for API calls
+import React from "react";
+import { Layout, Avatar, Typography, Space } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import logo from "../assets/logo/logo.webp";
 
-function Header({ profilePicture }) {
-  const [name, setName] = useState('');  // Initialize name state
-  const [email, setEmail] = useState('');  // Add state for email
-  const navigate = useNavigate();
+const { Header: AntHeader } = Layout;
+const { Title, Text } = Typography;
 
-  useEffect(() => {
-    // Load user data
-    const loadUser = async () => {
-      const googleId = Cookies.get('googleId');  // Assuming googleId is stored in cookies
-
-      if (googleId) {
-        try {
-          // Fetch user info from backend using googleId
-          const response = await axios.get(`http://localhost:5001/api/users/googleId/${googleId}`);
-          const { email } = response.data;
-          setEmail(email);
-          
-          // If no name available, use the part before '@' in email as name
-          const userName = email ? email.split('@')[0] : '';
-          setName(userName);
-        } catch (error) {
-          console.error("Error fetching Google user data:", error);
-        }
-      } else {
-        // If no googleId, load from Flux store or localStorage
-        const user = UserStore.getUser();
-        if (user) {
-          setName(user.name);
-        } else {
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            setName(parsedUser.name);
-            setEmail(parsedUser.email);
-            UserActions.updateUser(parsedUser);  // Update UserStore with localStorage data
-          }
-        }
-      }
-    };
-
-    loadUser();  // Load user on component mount
-
-    UserStore.addChangeListener(loadUser);
-
-    return () => {
-      UserStore.removeChangeListener(loadUser);
-    };
-  }, []);
-
-  const handleLogout = async () => {
-    await axios.post('http://localhost:5001/api/users/logout');
-    UserActions.logout();
-    Cookies.remove('authToken');
-    Cookies.remove('connect.sid');
-    // Cookies.remove('googleId');
-    localStorage.removeItem('authToken');
-    navigate('/login');
-  };
-
+function Header({ name = "Guest", profilePicture }) {
   return (
-    <header className="dashboard-header">
-      <div className="left-section">
-        <img src={logo} alt="App Logo" className="logo" />
-        <h1 className="title">User Dashboard</h1>
-      </div>
+    <AntHeader
+      style={{
+        background: "#fff",
+        padding: "0 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <Space>
+        <img src={logo} alt="App Logo" style={{ height: "40px" }} />
+        <Title level={4} style={{ margin: 0 }}>
+          User Dashboard
+        </Title>
+      </Space>
 
-      <div className="center-section">
-        <h2 className="welcome-message">Welcome, {name}!</h2> {/* Display the name or email-based string */}
-      </div>
-
-      <div className="right-section">
-        <img src={profilePicture} alt="User Profile" className="profile-picture" />
-        <div className="quick-actions">
-          <i className="icon-notifications"></i>
-          <i className="icon-settings"></i>
-          <button className="logout-button" onClick={handleLogout}>Logout</button>
-        </div>
-      </div>
-    </header>
+      <Space>
+        <Text strong>Welcome, {name || "Guest"}!</Text>
+        <Avatar
+          size="large"
+          src={profilePicture}
+          icon={<UserOutlined />}
+          style={{ cursor: "pointer" }}
+        />
+      </Space>
+    </AntHeader>
   );
 }
 

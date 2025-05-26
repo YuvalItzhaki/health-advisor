@@ -1,45 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import WeightForm from './WeightForm';
-import HeightForm from './HeightForm';
-import Header from './Header';
-import HealthMetrics from './HealthMetrics';
-import '../style/Dashboard.css';
-import userStoreInstance from '../stores/UserStore';
-import HealthHistory from './HealthHistory';
-import Cookies from 'js-cookie';
-import useGoogleFitData from './GoogleFitData';
-import ActivityMap from './ActivityMap';
-import ActivityContainer from './ActivityContainer';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Layout, Card, Row, Col, Typography, Button, message } from "antd";
+import WeightForm from "./WeightForm";
+import HeightForm from "./HeightForm";
+import Header from "./Header";
+import HealthMetrics from "./HealthMetrics";
+import userStoreInstance from "../stores/UserStore";
+import HealthHistory from "./HealthHistory";
+import Cookies from "js-cookie";
+import useGoogleFitData from "./GoogleFitData";
+import ActivityMap from "./ActivityMap";
+import ActivityContainer from "./ActivityContainer";
 
-
+const { Title, Text } = Typography;
+const { Content } = Layout;
 
 function Dashboard() {
   const [weights, setWeights] = useState([]);
   const [heights, setHeights] = useState([]);
-  // const [selectedWeight, setSelectedWeight] = useState(null);
-  // const [selectedHeight, setSelectedHeight] = useState(null);
-  // const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
-  // const googleIdFromCookies = Cookies.get('googleId');
-  const { fitData, error, fetchGoogleFitData } = useGoogleFitData(); // Call the hook
-  const [activityLocation, setActivityLocation] = useState(null);
+  const { fitData, error, fetchGoogleFitData } = useGoogleFitData();
+  const [activityLocation, setActivityLocation] = useState({
+    lat: 37.7749,
+    lng: -122.4194,
+  });
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     const userFromStore = userStoreInstance.getUser();
-    const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
-    const googleIdFromCookies = Cookies.get('googleId');
-    const authToken = localStorage.getItem('authToken') || Cookies.get('authToken');
-    setActivityLocation({
-      lat: 37.7749,  // Replace with actual latitude from activity data
-      lng: -122.4194, // Replace with actual longitude from activity data
-    });
+    const storedUserId =
+      userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
+    const googleIdFromCookies = Cookies.get("googleId");
+    const authToken =
+      localStorage.getItem("authToken") || Cookies.get("authToken");
 
     if (!authToken) {
-      console.log('No authToken, redirecting to login.');
-      navigate('/login');
+      message.warning("No auth token, redirecting to login.");
+      navigate("/login");
       return;
     }
 
@@ -49,8 +47,8 @@ function Dashboard() {
     } else if (storedUserId) {
       fetchHealthData(`user/${storedUserId}`, authToken);
     } else {
-      console.log('No userId or googleId, redirecting to login.');
-      navigate('/login');
+      message.warning("No user ID or Google ID, redirecting to login.");
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -66,91 +64,140 @@ function Dashboard() {
       })
       .catch((error) => {
         if (error.response && error.response.status === 404) {
-          console.log('No health data found, redirecting to initial setup.');
-          navigate('/initial-setup');
+          message.info("No health data found, redirecting to initial setup.");
+          navigate("/initial-setup");
         } else {
-          console.error('Error fetching health data:', error);
+          message.error("Error fetching health data.");
+          console.error("Error fetching health data:", error);
         }
       });
   };
 
   const getUserIdOrGoogleId = () => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     const userFromStore = userStoreInstance.getUser();
-    const storedUserId = userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
-    const googleIdFromCookies = Cookies.get('googleId');
+    const storedUserId =
+      userFromStore?.userId || storedUser?._id || storedUser?.userId || null;
+    const googleIdFromCookies = Cookies.get("googleId");
     return storedUserId || googleIdFromCookies;
   };
 
   const handleWeightSave = (newWeight) => {
     const id = getUserIdOrGoogleId();
-  
-    axios.put(`http://localhost:5001/api/health/update/weights/${id}`, {
-        value: { value: newWeight, date: new Date() }, // Sending 'value' field
+
+    axios
+      .put(`http://localhost:5001/api/health/update/weights/${id}`, {
+        value: { value: newWeight, date: new Date() },
       })
       .then((response) => {
-        console.log('Weight updated:', response.data);
+        message.success("Weight updated.");
         const updatedWeight = { value: newWeight, date: new Date() };
         setWeights([...weights, updatedWeight]);
-        setSelectedWeight(updatedWeight);
       })
       .catch((error) => {
-        console.error('Error updating weight:', error);
+        message.error("Error updating weight.");
+        console.error("Error updating weight:", error);
       });
   };
-  
 
   const handleHeightSave = (newHeight) => {
     const id = getUserIdOrGoogleId();
-  
-    axios.put(`http://localhost:5001/api/health/update/heights/${id}`, {
+
+    axios
+      .put(`http://localhost:5001/api/health/update/heights/${id}`, {
         value: { value: newHeight, date: new Date() },
       })
       .then((response) => {
-        console.log('Height updated:', response.data);
+        message.success("Height updated.");
         const updatedHeight = { value: newHeight, date: new Date() };
         setHeights([...heights, updatedHeight]);
-        setSelectedHeight(updatedHeight);
       })
       .catch((error) => {
-        console.error('Error updating height:', error);
+        message.error("Error updating height.");
+        console.error("Error updating height:", error);
       });
   };
-  
+
   const handleRefreshData = () => {
-    console.log('Refresh data from google fit')
+    message.info("Refreshing Google Fit data...");
     fetchGoogleFitData();
   };
 
   return (
-    <div className="dashboard">
+    <Layout style={{ padding: "24px" }}>
       <Header userName={userStoreInstance.getUser()?.name} />
-      <div className="metrics-grid">
-        <div className="metric-card">
-          <HealthMetrics weights={weights} heights={heights} />
-        </div>
-        <div className="metric-card">
-          <h3>Edit Your Health Data</h3>
-          <h4>Weight</h4>
-          <WeightForm onChange={(newWeight) => handleWeightSave(newWeight)} showSaveButton={true} />
-          <h4>Height</h4>
-          <HeightForm onChange={(newHeight) => handleHeightSave(newHeight)} showSaveButton={true} />
-        </div>
-        {Cookies.get('googleId') && (
-        <div>
-          <h2>Google Fit Data</h2>
-          {error && <p>{error}</p>}
-          <p>Steps: {fitData.steps > 0 ? fitData.steps : 'No steps data available.'}</p>
-          <p>Calories: {fitData.calories > 0 ? fitData.calories.toFixed(2) : 'No calories data available.'}</p>
-          <button onClick={handleRefreshData}>Refresh Data</button>
-          <h2>Activity Location</h2>
-          <ActivityContainer />
-          <ActivityMap activityLocation={activityLocation} />
-        </div>
+      <Content>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={12}>
+            <Card
+              title={<Title level={4}>Your Health Metrics</Title>}
+              bordered={false}
+            >
+              <HealthMetrics weights={weights} heights={heights} />
+            </Card>
+          </Col>
+          <Col xs={24} md={12}>
+            <Card
+              title={<Title level={4}>Edit Your Health Data</Title>}
+              bordered={false}
+            >
+              <Title level={5}>Weight</Title>
+              <WeightForm onChange={handleWeightSave} showSaveButton={true} />
+              <Title level={5}>Height</Title>
+              <HeightForm onChange={handleHeightSave} showSaveButton={true} />
+            </Card>
+          </Col>
+        </Row>
+
+        {Cookies.get("googleId") && (
+          <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
+            <Col xs={24} md={12}>
+              <Card
+                title={<Title level={4}>Google Fit Data</Title>}
+                bordered={false}
+              >
+                {error && <Text type="danger">{error}</Text>}
+                <p>
+                  Steps:{" "}
+                  {fitData.steps > 0
+                    ? fitData.steps
+                    : "No steps data available."}
+                </p>
+                <p>
+                  Calories:{" "}
+                  {fitData.calories > 0
+                    ? fitData.calories.toFixed(2)
+                    : "No calories data available."}
+                </p>
+                <Button type="primary" onClick={handleRefreshData}>
+                  Refresh Data
+                </Button>
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                title={<Title level={4}>Activity Map</Title>}
+                bordered={false}
+              >
+                <ActivityContainer />
+                <ActivityMap activityLocation={activityLocation} />
+              </Card>
+            </Col>
+          </Row>
         )}
-      </div>
-      <HealthHistory />
-    </div>
+
+        <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
+          <Col span={24}>
+            <Card
+              title={<Title level={4}>Health History</Title>}
+              bordered={false}
+            >
+              <HealthHistory />
+            </Card>
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
   );
 }
 

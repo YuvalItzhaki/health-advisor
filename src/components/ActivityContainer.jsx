@@ -81,33 +81,75 @@ const ActivityContainer = () => {
       }
     };
 
-    // Helper: Fetch location data for the specified session
+
+
     const fetchLocationData = async (sessionId, startTimeMillis, endTimeMillis) => {
       try {
-        const response = await axios.get(
-          `http://localhost:5001/api/googleFit/session-route?sessionId=${sessionId}&startTimeMillis=${startTimeMillis}&endTimeMillis=${endTimeMillis}`,
+        const response = await axios.post(
+          'http://localhost:5001/api/googleFit/fetch-location-data',
+          { sessionId, startTimeMillis, endTimeMillis },
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           }
         );
-
+    
+        console.log('Full Response Data:', response.data);
+    
         const locationPoints = response.data.locationPoints || [];
-
-        const formattedRoute = locationPoints
-          .filter(point => point.latitude !== undefined && point.longitude !== undefined) 
-          .map(point => ({
-            lat: parseFloat(point.latitude),
-            lng: parseFloat(point.longitude),
-          }))
-          .filter(point => !isNaN(point.lat) && !isNaN(point.lng));
-
-        setRoute(formattedRoute);
+    
+        locationPoints.forEach((point, index) => {
+          console.log(`Point ${index}:`, point);
+          const rawLat = point.lat;
+          const rawLng = point.lng;
+    
+          console.log(`Raw Latitude (lat):`, rawLat);
+          console.log(`Raw Longitude (lng):`, rawLng);
+    
+          const processedLat = rawLat && rawLat.fpVal !== undefined ? rawLat.fpVal : rawLat;
+          const processedLng = rawLng ? rawLng : 0;
+    
+          console.log(`Processed Latitude:`, processedLat);
+          console.log(`Processed Longitude:`, processedLng);
+        });
       } catch (error) {
         console.error('Error fetching location data:', error.response?.data || error.message);
       }
     };
+    
+
+    
+
+
+    // Helper: Fetch location data for the specified session
+    // const fetchLocationData = async (sessionId, startTimeMillis, endTimeMillis) => {
+    //   try {
+    //     const response = await axios.get(
+    //       `http://localhost:5001/api/googleFit/session-route?sessionId=${sessionId}&startTimeMillis=${startTimeMillis}&endTimeMillis=${endTimeMillis}`,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${accessToken}`,
+    //         },
+    //       }
+    //     );
+
+    //     const locationPoints = response.data.locationPoints || [];
+    //     console.log('locationPoints:', locationPoints)
+
+    //     const formattedRoute = locationPoints
+    //       .filter(point => point.latitude !== undefined && point.longitude !== undefined) 
+    //       .map(point => ({
+    //         lat: parseFloat(point.latitude),
+    //         lng: parseFloat(point.longitude),
+    //       }))
+    //       .filter(point => !isNaN(point.lat) && !isNaN(point.lng));
+
+    //     setRoute(formattedRoute);
+    //   } catch (error) {
+    //     console.error('Error fetching location data:', error.response?.data || error.message);
+    //   }
+    // };
 
     if (accessToken) {
       fetchRouteData();

@@ -1,61 +1,83 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import UserActions from '../actions/UserActions';  // Import Flux UserActions
+import React from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import UserActions from "../actions/UserActions";
+import { Form, Input, Button, Typography, message } from "antd";
+
+const { Title } = Typography;
 
 function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFinish = async (values) => {
+    const { name, email, password } = values;
     try {
-      const response = await axios.post('http://localhost:5001/api/users/register', { name, email, password }, { withCredentials: true });
-      console.log('response from server: ', response.data);
+      const response = await axios.post(
+        "http://localhost:5001/api/users/register",
+        { name, email, password },
+        { withCredentials: true }
+      );
+      console.log("response from server:", response.data);
 
-      // Use Flux to update the user
       UserActions.updateUser({
-        userId: response.data._id, 
+        userId: response.data._id,
         name: response.data.name,
-        email: response.data.email
+        email: response.data.email,
       });
 
-      // Redirect to the initial setup page
-      navigate('/initial-setup');
+      message.success("Registration successful! Redirecting...");
+      navigate("/initial-setup");
     } catch (err) {
       console.error(err);
+      message.error("Registration failed. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <label>Email:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label>Password:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Register</button>
-      </form>
+    <div style={{ maxWidth: 400, margin: "40px auto" }}>
+      <Title level={2} style={{ textAlign: "center" }}>
+        Register
+      </Title>
+      <Form
+        name="register"
+        onFinish={onFinish}
+        layout="vertical"
+        autoComplete="off"
+      >
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "Please input your name!" }]}
+        >
+          <Input placeholder="Enter your name" />
+        </Form.Item>
+
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true, message: "Please input your email!" },
+            { type: "email", message: "Please enter a valid email!" },
+          ]}
+        >
+          <Input placeholder="Enter your email" />
+        </Form.Item>
+
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: "Please input your password!" }]}
+          hasFeedback
+        >
+          <Input.Password placeholder="Enter your password" />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Register
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 }

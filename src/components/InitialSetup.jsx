@@ -1,92 +1,127 @@
-import React, { useState } from 'react';
-import WeightForm from './WeightForm';
-import HeightForm from './HeightForm';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import userStoreInstance from '../stores/UserStore';
-import Cookies from 'js-cookie';
+import React, { useState } from "react";
+import WeightForm from "./WeightForm";
+import HeightForm from "./HeightForm";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import userStoreInstance from "../stores/UserStore";
+import Cookies from "js-cookie";
+import {
+  Typography,
+  InputNumber,
+  Select,
+  Button,
+  Form,
+  Space,
+  message,
+} from "antd";
+
+const { Title, Paragraph } = Typography;
+const { Option } = Select;
 
 function InitialSetup() {
-  // Get user data from UserStore, localStorage, and Cookies
-  const storedUser = JSON.parse(localStorage.getItem('user')); // Parse the user from localStorage
-  const userId = userStoreInstance.getUser()?.userId || (storedUser ? storedUser._id : null);
-  const googleId = Cookies.get('googleId'); // Google ID from cookies
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId =
+    userStoreInstance.getUser()?.userId || (storedUser ? storedUser._id : null);
+  const googleId = Cookies.get("googleId");
 
-  const [weightValue, setWeightValue] = useState(''); // For storing a single weight input
-  const [heightValue, setHeightValue] = useState(''); // For storing a single height input
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
+  const [weightValue, setWeightValue] = useState("");
+  const [heightValue, setHeightValue] = useState("");
+  const [age, setAge] = useState(null);
+  const [gender, setGender] = useState("");
+
   const navigate = useNavigate();
 
   const handleSave = async () => {
-    const currentDate = new Date(); // Current date to save with weight and height
+    if (!weightValue || !heightValue || !age || !gender) {
+      message.error("Please fill in all fields before saving.");
+      return;
+    }
 
-    // Prepare the weights and heights arrays with the first record
+    const currentDate = new Date();
+
     const weights = [{ value: Number(weightValue), date: currentDate }];
     const heights = [{ value: Number(heightValue), date: currentDate }];
 
     try {
-      // Send a single POST request with all the data
-      const response = await axios.post('http://localhost:5001/api/health/setup', {
-        userId: userId || undefined,  // If the user has a userId, pass it
-        googleId: googleId || undefined,  // If the user logged in with Google, pass googleId
-        weights,
-        heights,
-        age,
-        gender,
-      });
+      const response = await axios.post(
+        "http://localhost:5001/api/health/setup",
+        {
+          userId: userId || undefined,
+          googleId: googleId || undefined,
+          weights,
+          heights,
+          age,
+          gender,
+        }
+      );
 
-      console.log('Initial setup data saved:', response.data);
-      navigate('/dashboard'); // Navigate to the dashboard after saving
+      message.success("Initial setup data saved successfully!");
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Error saving initial setup data:', error);
+      console.error("Error saving initial setup data:", error);
+      message.error("Failed to save data. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2>Initial Setup</h2>
+    <div style={{ maxWidth: 450, margin: "40px auto" }}>
+      <Title level={2} style={{ textAlign: "center" }}>
+        Initial Setup
+      </Title>
 
-      <p>Please enter your initial weight.</p>
-      <WeightForm 
-        existingWeight={weightValue} 
-        onChange={(value) => setWeightValue(value)} 
-        showSaveButton={false} 
+      <Paragraph>Please enter your initial weight.</Paragraph>
+      <WeightForm
+        existingWeight={weightValue}
+        onChange={(value) => setWeightValue(value)}
+        showSaveButton={false}
       />
 
-      <p>Please enter your height.</p>
-      <HeightForm 
-        existingHeight={heightValue} 
-        onChange={(value) => setHeightValue(value)} 
-        showSaveButton={false} 
+      <Paragraph>Please enter your height.</Paragraph>
+      <HeightForm
+        existingHeight={heightValue}
+        onChange={(value) => setHeightValue(value)}
+        showSaveButton={false}
       />
 
-      <p>Please enter your age.</p>
-      <div>
-        <label>Age:</label>
-        <input
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
+      <Form layout="vertical">
+        <Form.Item
+          label="Age"
           required
-        />
-      </div>
-      
-      <p>Please select your gender.</p>
-      <select
-        value={gender}
-        onChange={(e) => setGender(e.target.value)}
-        required
-      >
-        <option value="">Select Gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
-      
-      <div>
-        <button onClick={handleSave}>Save & Continue</button>
-      </div>
+          rules={[{ required: true, message: "Please input your age!" }]}
+        >
+          <InputNumber
+            min={1}
+            max={120}
+            value={age}
+            onChange={(value) => setAge(value)}
+            style={{ width: "100%" }}
+            placeholder="Enter your age"
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Gender"
+          required
+          rules={[{ required: true, message: "Please select your gender!" }]}
+        >
+          <Select
+            placeholder="Select Gender"
+            value={gender}
+            onChange={(value) => setGender(value)}
+          >
+            <Option value="">Select Gender</Option>
+            <Option value="male">Male</Option>
+            <Option value="female">Female</Option>
+            <Option value="other">Other</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" block onClick={handleSave}>
+            Save & Continue
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 }

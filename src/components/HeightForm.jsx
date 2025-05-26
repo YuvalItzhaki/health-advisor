@@ -1,43 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { InputNumber, Button, Space } from "antd";
 
 function HeightForm({ existingHeight, onChange, showSaveButton }) {
-  const [height, setHeight] = useState(existingHeight || '');
+  const [height, setHeight] = useState(existingHeight || "");
 
-  const handleHeightChange = (e) => {
-    setHeight(e.target.value);
+  // Sync local height state if existingHeight prop changes
+  useEffect(() => {
+    setHeight(existingHeight || "");
+  }, [existingHeight]);
+
+  const handleHeightChange = (value) => {
+    setHeight(value);
+    if (!showSaveButton) {
+      // If no save button, update parent immediately on change
+      onChange(value);
+    }
   };
 
   const handleSubmit = () => {
     onChange(height);
   };
 
-  let content;
-
-  if (showSaveButton) {
-    content = (
-      <div>
-        <input
-          type="number"
-          value={height}
-          onChange={handleHeightChange}
-        />
-        <button onClick={handleSubmit}>Save Height</button>
-      </div>
-    );
-  } else {
-    content = (
-      <div>
-        <input
-          type="number"
-          value={existingHeight || ''}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        {showSaveButton && <button>Save</button>}
-      </div>
-    );
-  }
-
-  return <div>{content}</div>;
-  }
+  return (
+    <Space>
+      <InputNumber
+        min={0}
+        value={height}
+        onChange={handleHeightChange}
+        placeholder="Enter height"
+        style={{ width: 120 }}
+      />
+      {showSaveButton && (
+        <Button type="primary" onClick={handleSubmit}>
+          Save Height
+        </Button>
+      )}
+    </Space>
+  );
+}
 
 export default HeightForm;
