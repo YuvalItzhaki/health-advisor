@@ -28,7 +28,7 @@ function WeightForm({ existingWeight, onChange, showSaveButton }) {
         value={weight}
         onChange={handleWeightChange}
         placeholder="Enter weight"
-        style={{ width: 120 }}
+        style={{ width: 150 }}
       />
       {showSaveButton && (
         <Button type="primary" onClick={handleSubmit}>

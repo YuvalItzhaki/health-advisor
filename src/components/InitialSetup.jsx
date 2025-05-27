@@ -11,11 +11,11 @@ import {
   Select,
   Button,
   Form,
-  Space,
+  Card,
   message,
 } from "antd";
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const { Option } = Select;
 
 function InitialSetup() {
@@ -43,17 +43,14 @@ function InitialSetup() {
     const heights = [{ value: Number(heightValue), date: currentDate }];
 
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/health/setup",
-        {
-          userId: userId || undefined,
-          googleId: googleId || undefined,
-          weights,
-          heights,
-          age,
-          gender,
-        }
-      );
+      await axios.post("http://localhost:5001/api/health/setup", {
+        userId: userId || undefined,
+        googleId: googleId || undefined,
+        weights,
+        heights,
+        age,
+        gender,
+      });
 
       message.success("Initial setup data saved successfully!");
       navigate("/dashboard");
@@ -64,26 +61,28 @@ function InitialSetup() {
   };
 
   return (
-    <div style={{ maxWidth: 450, margin: "40px auto" }}>
-      <Title level={2} style={{ textAlign: "center" }}>
+    <Card style={{ maxWidth: 400, margin: "50px auto", padding: "30px" }}>
+      <Title level={2} style={{ textAlign: "center", marginBottom: 30 }}>
         Initial Setup
       </Title>
 
-      <Paragraph>Please enter your initial weight.</Paragraph>
-      <WeightForm
-        existingWeight={weightValue}
-        onChange={(value) => setWeightValue(value)}
-        showSaveButton={false}
-      />
-
-      <Paragraph>Please enter your height.</Paragraph>
-      <HeightForm
-        existingHeight={heightValue}
-        onChange={(value) => setHeightValue(value)}
-        showSaveButton={false}
-      />
-
       <Form layout="vertical">
+        <Form.Item label="Weight" required>
+          <WeightForm
+            existingWeight={weightValue}
+            onChange={(value) => setWeightValue(value)}
+            showSaveButton={false}
+          />
+        </Form.Item>
+
+        <Form.Item label="Height" required>
+          <HeightForm
+            existingHeight={heightValue}
+            onChange={(value) => setHeightValue(value)}
+            showSaveButton={false}
+          />
+        </Form.Item>
+
         <Form.Item
           label="Age"
           required
@@ -108,8 +107,8 @@ function InitialSetup() {
             placeholder="Select Gender"
             value={gender}
             onChange={(value) => setGender(value)}
+            style={{ width: "100%" }}
           >
-            <Option value="">Select Gender</Option>
             <Option value="male">Male</Option>
             <Option value="female">Female</Option>
             <Option value="other">Other</Option>
@@ -122,7 +121,7 @@ function InitialSetup() {
           </Button>
         </Form.Item>
       </Form>
-    </div>
+    </Card>
   );
 }
 

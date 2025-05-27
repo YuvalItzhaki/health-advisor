@@ -28,7 +28,7 @@ function HeightForm({ existingHeight, onChange, showSaveButton }) {
         value={height}
         onChange={handleHeightChange}
         placeholder="Enter height"
-        style={{ width: 120 }}
+        style={{ width: 150 }}
       />
       {showSaveButton && (
         <Button type="primary" onClick={handleSubmit}>

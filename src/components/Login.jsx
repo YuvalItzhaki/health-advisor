@@ -77,9 +77,9 @@ function Login() {
         </Form.Item>
       </Form>
 
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
+      <Form.Item>
         <GoogleFitButton />
-      </div>
+      </Form.Item>
     </Card>
   );
 }

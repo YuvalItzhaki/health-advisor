@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Layout, Card, Row, Col, Typography, Button, message } from "antd";
+import {
+  Layout,
+  Statistic,
+  Card,
+  Row,
+  Col,
+  Typography,
+  Button,
+  message,
+} from "antd";
 import WeightForm from "./WeightForm";
 import HeightForm from "./HeightForm";
 import Header from "./Header";
@@ -151,27 +160,42 @@ function Dashboard() {
 
         {Cookies.get("googleId") && (
           <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
-            <Col xs={24} md={12}>
+            <Col span={12}>
               <Card
                 title={<Title level={4}>Google Fit Data</Title>}
                 bordered={false}
               >
-                {error && <Text type="danger">{error}</Text>}
-                <p>
-                  Steps:{" "}
-                  {fitData.steps > 0
-                    ? fitData.steps
-                    : "No steps data available."}
-                </p>
-                <p>
-                  Calories:{" "}
-                  {fitData.calories > 0
-                    ? fitData.calories.toFixed(2)
-                    : "No calories data available."}
-                </p>
-                <Button type="primary" onClick={handleRefreshData}>
-                  Refresh Data
-                </Button>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={12} md={8}>
+                    <Card>
+                      <Statistic
+                        title="Steps"
+                        value={
+                          fitData.steps > 0
+                            ? fitData.steps
+                            : "No steps data available"
+                        }
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12} md={8}>
+                    <Card>
+                      <Statistic
+                        title="Calories"
+                        value={
+                          fitData.calories > 0
+                            ? fitData.calories.toFixed(2)
+                            : "No calories data available"
+                        }
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12} md={8}>
+                    <Button type="primary" onClick={handleRefreshData}>
+                      Refresh Data
+                    </Button>
+                  </Col>
+                </Row>
               </Card>
             </Col>
             <Col xs={24} md={12}>

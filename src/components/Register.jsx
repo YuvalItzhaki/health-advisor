@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import UserActions from "../actions/UserActions";
-import { Form, Input, Button, Typography, message } from "antd";
+import { Form, Input, Button, Typography, message, Card } from "antd";
 
 const { Title } = Typography;
 
@@ -34,7 +34,7 @@ function Register() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "40px auto" }}>
+    <Card style={{ maxWidth: 400, margin: "50px auto", padding: "30px" }}>
       <Title level={2} style={{ textAlign: "center" }}>
         Register
       </Title>
@@ -78,7 +78,7 @@ function Register() {
           </Button>
         </Form.Item>
       </Form>
-    </div>
+    </Card>
   );
 }
 
